@@ -17,10 +17,10 @@ import json
 import random
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from werewolf.config import MAX_DEBATE_TURNS, NUM_PLAYERS
 from werewolf.lm import LmLog, generate
 from werewolf.prompts import ACTION_PROMPTS_AND_SCHEMAS
 from werewolf.utils import Deserializable
-from werewolf.config import  MAX_DEBATE_TURNS, NUM_PLAYERS
 
 # Role names
 VILLAGER = "Villager"
@@ -177,7 +177,7 @@ class Player(Deserializable):
         "debate_turns_left": MAX_DEBATE_TURNS - len(formatted_debate),
         "personality": self.personality,
         "num_players": NUM_PLAYERS,
-        "num_villagers": NUM_PLAYERS - 4, 
+        "num_villagers": NUM_PLAYERS - 4,
     }
 
   def _generate_action(

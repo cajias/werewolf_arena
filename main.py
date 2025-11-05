@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from werewolf.runner import run
 from absl import app as absl_app
+
+from werewolf.runner import run
 
 
 def main(_):

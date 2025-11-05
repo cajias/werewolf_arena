@@ -16,10 +16,10 @@ import dataclasses
 from typing import Any, Dict, List, Optional
 
 import jinja2
-from werewolf import utils
-from werewolf.utils import Deserializable
-from werewolf import apis
+
+from werewolf import apis, utils
 from werewolf.config import RETRIES
+from werewolf.utils import Deserializable
 
 
 @dataclasses.dataclass
