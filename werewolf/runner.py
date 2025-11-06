@@ -12,27 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
+import itertools
+import os
 import random
 import traceback
 from typing import List, Tuple
-import itertools
+
 import pandas as pd
-import os
-import datetime
-
-from absl import flags
 import tqdm
+from absl import flags
 
-from werewolf import logging
-from werewolf import game
-from werewolf.model import Doctor
-from werewolf.model import SEER
-from werewolf.model import Seer
-from werewolf.model import State
-from werewolf.model import Villager
-from werewolf.model import WEREWOLF
-from werewolf.model import Werewolf
+from werewolf import game, logging
 from werewolf.config import get_player_names
+from werewolf.model import SEER, WEREWOLF, Doctor, Seer, State, Villager, Werewolf
 
 _RUN_GAME = flags.DEFINE_boolean("run", False, "Runs a single game.")
 _RESUME = flags.DEFINE_boolean("resume", False, "Resumes games.")
@@ -172,7 +165,7 @@ def resume_game(directory: str) -> bool:
     gm.logs = logs
     try:
         gm.run_game()
-    except Exception as e:
+    except Exception:
         state.error_message = traceback.format_exc()
     logging.save_game(state, gm.logs, directory)
     return not state.error_message

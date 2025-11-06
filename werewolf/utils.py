@@ -14,11 +14,11 @@
 
 """utility functions."""
 
+from abc import ABC, abstractmethod
 from typing import Any
-import yaml
-from abc import ABC
-from abc import abstractmethod
+
 import marko
+import yaml
 
 
 def parse_json(text: str) -> dict[str, Any] | None:

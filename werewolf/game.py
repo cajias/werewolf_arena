@@ -14,15 +14,16 @@
 
 """Werewolf game."""
 
+import random
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
-import random
 from typing import List
 
 import tqdm
 
+from werewolf.config import MAX_DEBATE_TURNS, RUN_SYNTHETIC_VOTES
 from werewolf.model import Round, RoundLog, State, VoteLog
-from werewolf.config import  MAX_DEBATE_TURNS, RUN_SYNTHETIC_VOTES
+
 
 def get_max_bids(d):
   """Gets all the keys with the highest value in the dictionary."""

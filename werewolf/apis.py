@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from openai import OpenAI
 import os
-
 from typing import Any
+
 import google
 import vertexai
-from vertexai.preview import generative_models
 from anthropic import AnthropicVertex
+from openai import OpenAI
+from vertexai.preview import generative_models
 
 
 def generate(model, **kwargs):

@@ -24,5 +24,5 @@ RUN_SYNTHETIC_VOTES = True
 MAX_DEBATE_TURNS = 8
 NUM_PLAYERS = 8
 
-def get_player_names(): 
+def get_player_names():
     return random.sample(NAMES, NUM_PLAYERS)
