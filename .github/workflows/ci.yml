@@ -33,7 +33,7 @@ jobs:
       run: ruff check --select I .
 
   test:
-    name: Install and verify package
+    name: Run tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -58,3 +58,7 @@ jobs:
       run: |
         python -c "import werewolf; print('Package imported successfully')"
         python main.py --help || echo "Main script can be executed"
+
+    - name: Run tests with pytest
+      run: |
+        pytest tests/ -v --cov=werewolf --cov-report=term-missing
