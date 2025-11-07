@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import os
-from typing import Any
+from typing import Any, Dict, Optional
 
 import google
 import vertexai
@@ -69,7 +69,7 @@ def generate_vertexai(
     prompt: str,
     temperature: float = 0.7,
     json_mode: bool = True,
-    json_schema: dict[str, Any] | None = None,
+    json_schema: Optional[Dict[str, Any]] = None,
     **kwargs,
 ) -> str:
     """Generates text content using Vertex AI."""

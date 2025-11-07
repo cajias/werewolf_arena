@@ -17,6 +17,7 @@ import json
 import random
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+# For Python 3.8/3.9 compatibility, avoid using | for Union types
 from werewolf.config import MAX_DEBATE_TURNS, NUM_PLAYERS
 from werewolf.lm import LmLog, generate
 from werewolf.prompts import ACTION_PROMPTS_AND_SCHEMAS
@@ -79,7 +80,7 @@ class GameView:
   ):
     self.round_number: int = round_number
     self.current_players: List[str] = current_players
-    self.debate: List[tuple[str, str]] = []
+    self.debate: List[Tuple[str, str]] = []
     self.other_wolf: Optional[str] = other_wolf
 
   def update_debate(self, author: str, dialogue: str):
@@ -184,7 +185,7 @@ class Player(Deserializable):
       self,
       action: str,
       options: Optional[List[str]] = None,
-  ) -> tuple[Any | None, LmLog]:
+  ) -> Tuple[Optional[Any], LmLog]:
     """Helper function to generate player actions."""
     game_state = self._get_game_state()
     if options:
@@ -210,7 +211,7 @@ class Player(Deserializable):
         result_key=result_key,
     )
 
-  def vote(self) -> tuple[str | None, LmLog]:
+  def vote(self) -> Tuple[Optional[str], LmLog]:
     """Vote for a player."""
     if not self.gamestate:
       raise ValueError(
@@ -229,7 +230,7 @@ class Player(Deserializable):
       )
     return vote, log
 
-  def bid(self) -> tuple[int | None, LmLog]:
+  def bid(self) -> Tuple[Optional[int], LmLog]:
     """Place a bid."""
     bid, log = self._generate_action("bid", options=["0", "1", "2", "3", "4"])
     if bid is not None:
@@ -237,7 +238,7 @@ class Player(Deserializable):
       self.bidding_rationale = log.result.get("reasoning", "")
     return bid, log
 
-  def debate(self) -> tuple[str | None, LmLog]:
+  def debate(self) -> Tuple[Optional[str], LmLog]:
     """Engage in the debate."""
     result, log = self._generate_action("debate", [])
     if result is not None:
@@ -245,7 +246,7 @@ class Player(Deserializable):
       return say, log
     return result, log
 
-  def summarize(self) -> tuple[str | None, LmLog]:
+  def summarize(self) -> Tuple[Optional[str], LmLog]:
     """Summarize the game state."""
     result, log = self._generate_action("summarize", [])
     if result is not None:
@@ -285,7 +286,7 @@ class Villager(Player):
     )
 
   @classmethod
-  def from_json(cls, data: dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]):
     name = data["name"]
     model = data.get("model", None)
     o = cls(name=name, model=model)
@@ -314,7 +315,7 @@ class Werewolf(Player):
     state["werewolf_context"] = self._get_werewolf_context()
     return state
 
-  def eliminate(self) -> tuple[str | None, "LmLog"]:
+  def eliminate(self) -> Tuple[Optional[str], "LmLog"]:
     """Choose a player to eliminate."""
     if not self.gamestate:
       raise ValueError(
@@ -347,7 +348,7 @@ class Werewolf(Player):
     return context
 
   @classmethod
-  def from_json(cls, data: dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]):
     name = data["name"]
     model = data.get("model", None)
     o = cls(name=name, model=model)
@@ -369,7 +370,7 @@ class Seer(Player):
     super().__init__(name=name, role=SEER, model=model, personality=personality)
     self.previously_unmasked: Dict[str, str] = {}
 
-  def unmask(self) -> tuple[str | None, LmLog]:
+  def unmask(self) -> Tuple[Optional[str], LmLog]:
     """Choose a player to unmask."""
     if not self.gamestate:
       raise ValueError(
@@ -391,7 +392,7 @@ class Seer(Player):
     self.previously_unmasked[player] = role
 
   @classmethod
-  def from_json(cls, data: dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]):
     name = data["name"]
     model = data.get("model", None)
     o = cls(name=name, model=model)
@@ -415,7 +416,7 @@ class Doctor(Player):
         name=name, role=DOCTOR, model=model, personality=personality
     )
 
-  def save(self) -> tuple[str | None, LmLog]:
+  def save(self) -> Tuple[Optional[str], LmLog]:
     """Choose a player to protect."""
     if not self.gamestate:
       raise ValueError(
@@ -430,7 +431,7 @@ class Doctor(Player):
     return protected, log
 
   @classmethod
-  def from_json(cls, data: dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]):
     name = data["name"]
     model = data.get("model", None)
     o = cls(name=name, model=model)
@@ -462,10 +463,10 @@ class Round(Deserializable):
 
   def __init__(self):
     self.players: List[str] = []
-    self.eliminated: str | None = None
-    self.unmasked: str | None = None
-    self.protected: str | None = None
-    self.exiled: str | None = None
+    self.eliminated: Optional[str] = None
+    self.unmasked: Optional[str] = None
+    self.protected: Optional[str] = None
+    self.exiled: Optional[str] = None
     self.debate: List[Tuple[str, str]] = []
     self.votes: List[Dict[str, str]] = []
     self.bids: List[Dict[str, int]] = []
@@ -611,9 +612,9 @@ class RoundLog(Deserializable):
   """
 
   def __init__(self):
-    self.eliminate: LmLog | None = None
-    self.investigate: LmLog | None = None
-    self.protect: LmLog | None = None
+    self.eliminate: Optional[LmLog] = None
+    self.investigate: Optional[LmLog] = None
+    self.protect: Optional[LmLog] = None
     self.bid: List[List[Tuple[str, LmLog]]] = []
     self.debate: List[Tuple[str, LmLog]] = []
     self.votes: List[List[VoteLog]] = []

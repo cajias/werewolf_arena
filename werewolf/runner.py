@@ -171,7 +171,7 @@ def resume_game(directory: str) -> bool:
     return not state.error_message
 
 
-def resume_games(directories: list[str]):
+def resume_games(directories: List[str]):
     successful_resumes = []
     failed_resumes = []
     invalid_resumes = []
@@ -206,7 +206,10 @@ def run_game(
     seer, doctor, villagers, werewolves = initialize_players(
         villager_model, werewolf_model
     )
-    session_id = "10"  # You might want to make this unique per game
+    # Generate unique session ID based on timestamp
+    log_directory = logging.log_directory()
+    session_id = os.path.basename(log_directory)
+
     state = State(
         villagers=villagers,
         werewolves=werewolves,
@@ -223,7 +226,6 @@ def run_game(
         state.error_message = traceback.format_exc()
         print(f"Error encountered during game: {e}")
 
-    log_directory = logging.log_directory()
     logging.save_game(state, gamemaster.logs, log_directory)
     print(f"Game logs saved to: {log_directory}")
 
