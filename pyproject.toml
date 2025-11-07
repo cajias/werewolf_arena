@@ -15,19 +15,11 @@ select = ["E", "F", "I", "B", "W", "C90"]
 ignore = [
     "E203",  # Whitespace before ':' (conflicts with Black)
     "E501",  # Line too long (handled by Black)
-    "B008",  # Do not perform function calls in argument defaults
     # Additional ignores to match flake8 configuration
     "D300",  # Use """triple double quotes"""
     "D103",  # Missing docstring in public function
     "D105",  # Missing docstring in magic method
     "D106",  # Missing docstring in public nested class
-    # Temporarily ignore these to make the build pass
-    "B904",  # Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None`
-    "C901",  # Function is too complex
-    "B024",  # Abstract base class without abstract methods
-    "B027",  # Empty method in abstract base class with no abstract decorator
-    "B019",  # Use of functools.lru_cache on methods can lead to memory leaks
-    "B007",  # Loop control variable not used within loop body
 ]
 
 [tool.ruff.lint.isort]

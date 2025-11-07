@@ -96,70 +96,93 @@ def initialize_players(
     return seer, doctor, villagers, werewolves
 
 
+def _remove_failed_round(state: State, logs: List) -> None:
+    """Removes the last failed round and resets error state."""
+    if state.rounds and not state.rounds[-1].success:
+        state.rounds.pop()
+        logs.pop()
+    state.error_message = ""
+
+
+def _initialize_fresh_game(state: State) -> List[Werewolf]:
+    """Initializes game state when no rounds have been played."""
+    werewolves = []
+    for p in state.players.values():
+        p.initialize_game_view(
+            round_number=0,
+            current_players=list(state.players.keys()),
+        )
+        p.observations = []
+
+        if p.role == WEREWOLF:
+            werewolves.append(p)
+
+        if p.role == SEER:
+            p.previously_unmasked = {}
+
+    return werewolves
+
+
+def _update_seer_unmasking_history(player: Seer, state: State) -> None:
+    """Updates the seer's unmasking history from past rounds."""
+    unmasking_history = {}
+    for r in state.rounds:
+        if r.unmasked:
+            unmasked_player = state.players.get(r.unmasked, None)
+            if unmasked_player:
+                unmasking_history[r.unmasked] = unmasked_player.role
+    player.previously_unmasked = unmasking_history
+
+
+def _resume_from_existing_rounds(state: State) -> List[Werewolf]:
+    """Updates game view for all active players from the last round."""
+    werewolves = []
+    failed_round = len(state.rounds)
+
+    for p in state.rounds[-1].players:
+        player = state.players.get(p, None)
+        if not player:
+            continue
+
+        player.initialize_game_view(
+            round_number=len(state.rounds),
+            current_players=state.rounds[-1].players[:],
+        )
+
+        # Remove the observation from the failed round for all active players
+        player.observations = [
+            o
+            for o in player.observations
+            if not o.startswith(f"Round {failed_round}")
+        ]
+
+        if player.role == WEREWOLF:
+            werewolves.append(player)
+
+        if player.role == SEER:
+            _update_seer_unmasking_history(player, state)
+
+    return werewolves
+
+
+def _set_werewolf_partners(werewolves: List[Werewolf]) -> None:
+    """Sets the other_wolf reference for werewolf partners."""
+    if len(werewolves) == 2:
+        werewolves[0].gamestate.other_wolf = werewolves[1].name
+        werewolves[1].gamestate.other_wolf = werewolves[0].name
+
+
 def resume_game(directory: str) -> bool:
     state, logs = logging.load_game(directory)
 
-    # remove the failed round and resume from the beginning of that round.
-    last_round = state.rounds[-1]
-    if not last_round.success:
-        state.rounds.pop()
-        logs.pop()
-    # Reset the error state
-    state.error_message = ""
+    _remove_failed_round(state, logs)
 
     if not state.rounds:
-        werewolves = []
-        for p in state.players.values():
-            p.initialize_game_view(
-                round_number=0,
-                current_players=list(state.players.keys()),
-            )
-            p.observations = []
-
-            if p.role == WEREWOLF:
-                werewolves.append(p)
-
-            if p.role == SEER:
-                p.previously_unmasked = {}
-
-        if len(werewolves) == 2:
-            werewolves[0].gamestate.other_wolf = werewolves[1].name
-            werewolves[1].gamestate.other_wolf = werewolves[0].name
+        werewolves = _initialize_fresh_game(state)
     else:
-        # Update the GameView for every active player
-        werewolves = []
-        for p in state.rounds[-1].players:
-            player = state.players.get(p, None)
-            if player:
-                player.initialize_game_view(
-                    round_number=len(state.rounds),
-                    current_players=state.rounds[-1].players[:],
-                )
+        werewolves = _resume_from_existing_rounds(state)
 
-                # Remove the observation from the failed round for all active players
-                failed_round = len(state.rounds)
-                player.observations = [
-                    o
-                    for o in player.observations
-                    if not o.startswith(f"Round {failed_round}")
-                ]
-
-                if player.role == WEREWOLF:
-                    werewolves.append(player)
-
-                # update the seer's unmasking history
-                unmasking_history = {}
-                if player.role == SEER:
-                    for r in state.rounds:
-                        if r.unmasked:
-                            unmasked_player = state.players.get(r.unmasked, None)
-                            if unmasked_player:
-                                unmasking_history[r.unmasked] = unmasked_player.role
-                    player.previously_unmasked = unmasking_history
-
-        if len(werewolves) == 2:
-            werewolves[0].gamestate.other_wolf = werewolves[1].name
-            werewolves[1].gamestate.other_wolf = werewolves[0].name
+    _set_werewolf_partners(werewolves)
 
     gm = game.GameMaster(state, num_threads=_THREADS.value)
     gm.logs = logs
