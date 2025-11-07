@@ -34,24 +34,21 @@ _NUM_GAMES = flags.DEFINE_integer(
     "num_games", 2, "Number of games to run used with eval."
 )
 _VILLAGER_MODELS = flags.DEFINE_list(
-    "v_models", "", "The model used for villagers values are: flash, pro, gpt4"
+    "v_models", "", "The model used for villagers values are: gpt4, gpt4o, gpt3.5"
 )
 _WEREWOLF_MODELS = flags.DEFINE_list(
-    "w_models", "", "The model used for werewolves values are: flash, pro, gpt4"
+    "w_models", "", "The model used for werewolves values are: gpt4, gpt4o, gpt3.5"
 )
 _ARENA = flags.DEFINE_boolean(
     "arena", False, "Only run games using different models for villagers and werewolves"
 )
 _THREADS = flags.DEFINE_integer("threads", 2, "Number of threads to run.")
 
-DEFAULT_WEREWOLF_MODELS = ["flash", "pro1.5"]
-DEFAULT_VILLAGER_MODELS = ["flash", "pro1.5"]
+DEFAULT_WEREWOLF_MODELS = ["gpt4o"]
+DEFAULT_VILLAGER_MODELS = ["gpt4o"]
 RESUME_DIRECTORIES = []
 
 model_to_id = {
-    "pro1.5": "gemini-1.5-pro-preview-0514",
-    "flash": "gemini-1.5-flash-001",
-    "pro1": "gemini-pro",
     "gpt4": "gpt-4-turbo-2024-04-09",
     "gpt4o": "gpt-4o-2024-05-13",
     "gpt3.5": "gpt-3.5-turbo-0125",
