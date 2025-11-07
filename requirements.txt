@@ -11,3 +11,4 @@ ruff
 pytest>=7.0.0
 pytest-cov>=4.0.0
 pytest-mock>=3.10.0
+importlib-metadata>=4.6.0; python_version < "3.10"
