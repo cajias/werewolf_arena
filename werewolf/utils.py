@@ -15,13 +15,13 @@
 """utility functions."""
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Dict, Optional
 
 import marko
 import yaml
 
 
-def parse_json(text: str) -> dict[str, Any] | None:
+def parse_json(text: str) -> Optional[Dict[str, Any]]:
     result_json = parse_json_markdown(text)
 
     if not result_json:
@@ -29,7 +29,7 @@ def parse_json(text: str) -> dict[str, Any] | None:
     return result_json
 
 
-def parse_json_markdown(text: str) -> dict[str, Any] | None:
+def parse_json_markdown(text: str) -> Optional[Dict[str, Any]]:
     ast = marko.parse(text)
 
     for c in ast.children:
@@ -41,7 +41,7 @@ def parse_json_markdown(text: str) -> dict[str, Any] | None:
     return None
 
 
-def parse_json_str(text: str) -> dict[str, Any] | None:
+def parse_json_str(text: str) -> Optional[Dict[str, Any]]:
     try:
         # use yaml.safe_load which handles missing quotes around field names.
         result_json = yaml.safe_load(text)
@@ -54,5 +54,5 @@ def parse_json_str(text: str) -> dict[str, Any] | None:
 class Deserializable(ABC):
     @classmethod
     @abstractmethod
-    def from_json(cls, data: dict[Any, Any]):
+    def from_json(cls, data: Dict[Any, Any]):
         pass
