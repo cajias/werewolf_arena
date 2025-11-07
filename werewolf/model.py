@@ -80,7 +80,7 @@ class GameView:
   ):
     self.round_number: int = round_number
     self.current_players: List[str] = current_players
-    self.debate: List[tuple[str, str]] = []
+    self.debate: List[Tuple[str, str]] = []
     self.other_wolf: Optional[str] = other_wolf
 
   def update_debate(self, author: str, dialogue: str):
@@ -286,7 +286,7 @@ class Villager(Player):
     )
 
   @classmethod
-  def from_json(cls, data: dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]):
     name = data["name"]
     model = data.get("model", None)
     o = cls(name=name, model=model)
@@ -348,7 +348,7 @@ class Werewolf(Player):
     return context
 
   @classmethod
-  def from_json(cls, data: dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]):
     name = data["name"]
     model = data.get("model", None)
     o = cls(name=name, model=model)
@@ -392,7 +392,7 @@ class Seer(Player):
     self.previously_unmasked[player] = role
 
   @classmethod
-  def from_json(cls, data: dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]):
     name = data["name"]
     model = data.get("model", None)
     o = cls(name=name, model=model)
@@ -431,7 +431,7 @@ class Doctor(Player):
     return protected, log
 
   @classmethod
-  def from_json(cls, data: dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]):
     name = data["name"]
     model = data.get("model", None)
     o = cls(name=name, model=model)

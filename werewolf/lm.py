@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import dataclasses
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import jinja2
 
@@ -45,7 +45,7 @@ def generate(
     temperature: float = 1.0,
     allowed_values: Optional[List[Any]] = None,
     result_key: Optional[str] = None,
-) -> tuple[Any, LmLog]:
+) -> Tuple[Any, LmLog]:
     """Generates text from the language model and parses the result.
 
     Args:

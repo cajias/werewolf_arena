@@ -171,7 +171,7 @@ def resume_game(directory: str) -> bool:
     return not state.error_message
 
 
-def resume_games(directories: list[str]):
+def resume_games(directories: List[str]):
     successful_resumes = []
     failed_resumes = []
     invalid_resumes = []
