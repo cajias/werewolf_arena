@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import random
+from typing import List
 
 RETRIES = 3
 NAMES = [
@@ -24,5 +25,5 @@ RUN_SYNTHETIC_VOTES = True
 MAX_DEBATE_TURNS = 8
 NUM_PLAYERS = 8
 
-def get_player_names():
+def get_player_names() -> List[str]:
     return random.sample(NAMES, NUM_PLAYERS)
