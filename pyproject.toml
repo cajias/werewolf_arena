@@ -28,3 +28,18 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["werewolf"]
+
+[tool.pytest.ini_options]
+markers = [
+    "ollama_integration: marks tests that require Ollama to be running (deselect with '-m \"not ollama_integration\"')",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+]

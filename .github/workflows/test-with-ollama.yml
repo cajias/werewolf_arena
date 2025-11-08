@@ -1,0 +1,120 @@
+name: E2E Tests with Ollama
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test-unit:
+    name: Unit Tests (No Ollama)
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Run linter
+      run: |
+        ruff check werewolf/ main.py examples/
+
+    - name: Run unit and mocked tests
+      run: |
+        python3 -m pytest tests/ -v --tb=short -m "not ollama_integration"
+
+  test-ollama-integration:
+    name: E2E Tests with Ollama
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Install Ollama
+      run: |
+        curl -fsSL https://ollama.com/install.sh | sh
+
+    - name: Start Ollama server
+      run: |
+        ollama serve &
+        sleep 5
+
+    - name: Pull small test model
+      run: |
+        ollama pull qwen:0.5b
+
+    - name: Verify Ollama is running
+      run: |
+        curl -s http://localhost:11434/api/version || echo "Ollama not responding"
+
+    - name: Run Ollama manual test
+      run: |
+        python3 test_ollama_manual.py
+
+    - name: Run all tests including Ollama integration
+      run: |
+        python3 -m pytest tests/ -v --tb=short
+
+  test-docker:
+    name: Test in Docker (Optional)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: |
+        docker build -f Dockerfile.ollama -t werewolf-arena-ollama:test .
+
+    - name: Run tests in Docker
+      run: |
+        docker run --rm werewolf-arena-ollama:test /app/run_tests.sh tests/ -v
+
+  publish-docker-image:
+    name: Publish Docker Image
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [test-unit, test-ollama-integration]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile.ollama
+        push: true
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/werewolf-arena-ollama:latest
+          ${{ secrets.DOCKERHUB_USERNAME }}/werewolf-arena-ollama:${{ github.sha }}
+        cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/werewolf-arena-ollama:buildcache
+        cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/werewolf-arena-ollama:buildcache,mode=max

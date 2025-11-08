@@ -1,0 +1,48 @@
+FROM python:3.11-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Ollama
+RUN curl -fsSL https://ollama.com/install.sh | sh
+
+# Set environment variables
+ENV OLLAMA_HOST=0.0.0.0:11434
+ENV OLLAMA_MODELS=/root/.ollama/models
+
+# Create a directory for the app
+WORKDIR /app
+
+# Copy requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Pre-download a small model for testing (qwen:0.5b is ~400MB)
+# We'll do this in a script that runs in CI to keep image size reasonable
+# Alternatively, we can bake it into the image if we want faster CI runs
+
+# Copy the application code
+COPY . .
+
+# Create a startup script that:
+# 1. Starts Ollama server in background
+# 2. Pulls the model if not present
+# 3. Runs tests
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo "Starting Ollama server..."\n\
+ollama serve &\n\
+OLLAMA_PID=$!\n\
+sleep 5\n\
+echo "Pulling qwen:0.5b model..."\n\
+ollama pull qwen:0.5b\n\
+echo "Running tests..."\n\
+python3 -m pytest "$@"\n\
+kill $OLLAMA_PID\n\
+' > /app/run_tests.sh && chmod +x /app/run_tests.sh
+
+# Default command runs all tests
+CMD ["/app/run_tests.sh", "-v"]
