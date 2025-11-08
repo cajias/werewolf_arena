@@ -36,12 +36,12 @@ _NUM_GAMES = flags.DEFINE_integer(
 _VILLAGER_MODELS = flags.DEFINE_list(
     "v_models",
     "",
-    "The model used for villagers values are: gpt4, gpt4o, gpt3.5, claude3-sonnet, claude3-haiku, claude3-opus",
+    "The model used for villagers values are: gpt4, gpt4o, gpt3.5, claude3-sonnet, claude3-haiku, claude3-opus, deepseek-r1, llama2, qwen",
 )
 _WEREWOLF_MODELS = flags.DEFINE_list(
     "w_models",
     "",
-    "The model used for werewolves values are: gpt4, gpt4o, gpt3.5, claude3-sonnet, claude3-haiku, claude3-opus",
+    "The model used for werewolves values are: gpt4, gpt4o, gpt3.5, claude3-sonnet, claude3-haiku, claude3-opus, deepseek-r1, llama2, qwen",
 )
 _ARENA = flags.DEFINE_boolean(
     "arena", False, "Only run games using different models for villagers and werewolves"
@@ -59,6 +59,10 @@ model_to_id = {
     "claude3-opus": "anthropic.claude-3-opus-20240229-v1:0",
     "claude3-sonnet": "anthropic.claude-3-sonnet-20240229-v1:0",
     "claude3-haiku": "anthropic.claude-3-haiku-20240307-v1:0",
+    # Ollama models (prefix with ollama:)
+    "deepseek-r1": "ollama:deepseek-r1:latest",
+    "llama2": "ollama:llama2:latest",
+    "qwen": "ollama:qwen:latest",
 }
 
 

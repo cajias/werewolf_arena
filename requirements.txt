@@ -3,6 +3,7 @@ tqdm
 absl-py
 openai
 boto3
+requests
 pyyaml
 marko
 pandas
