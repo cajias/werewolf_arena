@@ -34,10 +34,14 @@ _NUM_GAMES = flags.DEFINE_integer(
     "num_games", 2, "Number of games to run used with eval."
 )
 _VILLAGER_MODELS = flags.DEFINE_list(
-    "v_models", "", "The model used for villagers values are: gpt4, gpt4o, gpt3.5"
+    "v_models",
+    "",
+    "The model used for villagers values are: gpt4, gpt4o, gpt3.5, claude3-sonnet, claude3-haiku, claude3-opus",
 )
 _WEREWOLF_MODELS = flags.DEFINE_list(
-    "w_models", "", "The model used for werewolves values are: gpt4, gpt4o, gpt3.5"
+    "w_models",
+    "",
+    "The model used for werewolves values are: gpt4, gpt4o, gpt3.5, claude3-sonnet, claude3-haiku, claude3-opus",
 )
 _ARENA = flags.DEFINE_boolean(
     "arena", False, "Only run games using different models for villagers and werewolves"
@@ -52,6 +56,9 @@ model_to_id = {
     "gpt4": "gpt-4-turbo-2024-04-09",
     "gpt4o": "gpt-4o-2024-05-13",
     "gpt3.5": "gpt-3.5-turbo-0125",
+    "claude3-opus": "anthropic.claude-3-opus-20240229-v1:0",
+    "claude3-sonnet": "anthropic.claude-3-sonnet-20240229-v1:0",
+    "claude3-haiku": "anthropic.claude-3-haiku-20240307-v1:0",
 }
 
 

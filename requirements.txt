@@ -2,6 +2,7 @@ jinja2
 tqdm
 absl-py
 openai
+boto3
 pyyaml
 marko
 pandas
