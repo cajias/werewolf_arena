@@ -14,12 +14,64 @@
 
 import json
 import os
+from typing import Optional
 
 import boto3
+from botocore.exceptions import BotoCoreError, ClientError
 from openai import OpenAI
 
+# Module-level client cache to avoid recreating clients on every call
+_bedrock_client: Optional[object] = None
+_openai_client: Optional[OpenAI] = None
 
-def generate(model, **kwargs):
+
+def _get_bedrock_client():
+    """Returns a cached Bedrock Runtime client."""
+    global _bedrock_client
+    if _bedrock_client is None:
+        region = os.environ.get("AWS_REGION", "us-east-1")
+        try:
+            _bedrock_client = boto3.client(
+                service_name="bedrock-runtime",
+                region_name=region,
+            )
+        except Exception as e:
+            raise RuntimeError(
+                f"Failed to create AWS Bedrock client. Ensure AWS credentials are configured. Error: {e}"
+            ) from e
+    return _bedrock_client
+
+
+def _get_openai_client() -> OpenAI:
+    """Returns a cached OpenAI client."""
+    global _openai_client
+    if _openai_client is None:
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "OPENAI_API_KEY environment variable is not set. "
+                "Please configure your OpenAI API key."
+            )
+        _openai_client = OpenAI(api_key=api_key)
+    return _openai_client
+
+
+def generate(model: str, **kwargs) -> str:
+    """Routes model generation requests to the appropriate provider.
+
+    Args:
+        model: Model identifier (e.g., 'gpt-4', 'claude-3-sonnet')
+        **kwargs: Additional arguments passed to the provider function
+
+    Returns:
+        Generated text response
+
+    Raises:
+        ValueError: If model is not supported
+    """
+    if not model:
+        raise ValueError("Model parameter cannot be empty")
+
     if "gpt" in model:
         return generate_openai(model, **kwargs)
     elif "claude" in model or "anthropic" in model:
@@ -31,51 +83,126 @@ def generate(model, **kwargs):
 
 
 # openai
-def generate_openai(model: str, prompt: str, json_mode: bool = True, **kwargs):
-    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+def generate_openai(model: str, prompt: str, json_mode: bool = True, **kwargs) -> str:
+    """Generates text using OpenAI API.
 
-    response_format = {"type": "text"}
-    if json_mode:
-        response_format = {"type": "json_object"}
-    response = client.chat.completions.create(
-        messages=[{"role": "user", "content": prompt}],
-        response_format=response_format,
-        model=model,
-    )
+    Args:
+        model: OpenAI model identifier (e.g., 'gpt-4', 'gpt-4o')
+        prompt: Input prompt text
+        json_mode: If True, request JSON-formatted response
+        **kwargs: Additional arguments (unused, for compatibility)
 
-    txt = response.choices[0].message.content
-    return txt
+    Returns:
+        Generated text response
+
+    Raises:
+        RuntimeError: If API key is not configured or API call fails
+        ValueError: If response is invalid
+    """
+    if not prompt:
+        raise ValueError("Prompt parameter cannot be empty")
+
+    try:
+        client = _get_openai_client()
+
+        response_format = {"type": "text"}
+        if json_mode:
+            response_format = {"type": "json_object"}
+
+        response = client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            response_format=response_format,
+            model=model,
+        )
+
+        if not response.choices or not response.choices[0].message.content:
+            raise ValueError(
+                f"OpenAI API returned invalid response for model {model}"
+            )
+
+        return response.choices[0].message.content
+
+    except Exception as e:
+        if isinstance(e, (RuntimeError, ValueError)):
+            raise
+        raise RuntimeError(f"OpenAI API call failed for model {model}: {e}") from e
 
 
 # aws bedrock
-def generate_bedrock(model: str, prompt: str, json_mode: bool = True, **kwargs):
-    """Generates text using AWS Bedrock with Claude models."""
-    # Create Bedrock Runtime client
-    # AWS credentials should be configured via environment variables or AWS config
-    bedrock_runtime = boto3.client(
-        service_name="bedrock-runtime",
-        region_name=os.environ.get("AWS_REGION", "us-east-1"),
-    )
+def generate_bedrock(model: str, prompt: str, json_mode: bool = True, **kwargs) -> str:
+    """Generates text using AWS Bedrock with Claude models.
 
-    # Prepare the request body for Claude models
-    request_body = {
-        "anthropic_version": "bedrock-2023-05-31",
-        "max_tokens": 4096,
-        "messages": [{"role": "user", "content": prompt}],
-    }
+    Args:
+        model: Bedrock model identifier (e.g., 'anthropic.claude-3-sonnet-20240229-v1:0')
+        prompt: Input prompt text
+        json_mode: Reserved for future use (currently ignored for Bedrock compatibility)
+        **kwargs: Additional arguments:
+            - max_tokens: Maximum tokens to generate (default: 4096)
+            - temperature: Sampling temperature (default: not set, uses model default)
 
-    # Invoke the model
-    response = bedrock_runtime.invoke_model(
-        modelId=model,
-        body=json.dumps(request_body),
-    )
+    Returns:
+        Generated text response
 
-    # Parse the response
-    response_body = json.loads(response["body"].read())
+    Raises:
+        RuntimeError: If AWS credentials are not configured or API call fails
+        ValueError: If prompt is empty or response is invalid
+    """
+    if not prompt:
+        raise ValueError("Prompt parameter cannot be empty")
 
-    # Extract text from the response
-    # Claude models return content as a list of content blocks
-    if "content" in response_body and len(response_body["content"]) > 0:
+    try:
+        bedrock_runtime = _get_bedrock_client()
+
+        # Extract optional parameters
+        max_tokens = kwargs.get("max_tokens", 4096)
+        temperature = kwargs.get("temperature")
+
+        # Prepare the request body for Claude models
+        request_body = {
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": max_tokens,
+            "messages": [{"role": "user", "content": prompt}],
+        }
+
+        # Add temperature if specified
+        if temperature is not None:
+            request_body["temperature"] = temperature
+
+        # Invoke the model
+        response = bedrock_runtime.invoke_model(
+            modelId=model,
+            body=json.dumps(request_body),
+        )
+
+        # Parse the response
+        response_body = json.loads(response["body"].read())
+
+        # Extract text from the response
+        # Claude models return content as a list of content blocks
+        if "content" not in response_body:
+            raise ValueError(
+                f"AWS Bedrock returned response without 'content' field for model {model}"
+            )
+
+        if not response_body["content"] or len(response_body["content"]) == 0:
+            raise ValueError(
+                f"AWS Bedrock returned empty content for model {model}"
+            )
+
         return response_body["content"][0]["text"]
 
-    return ""
+    except (BotoCoreError, ClientError) as e:
+        raise RuntimeError(
+            f"AWS Bedrock API call failed for model {model}. "
+            f"Ensure AWS credentials are configured and the model is accessible. Error: {e}"
+        ) from e
+    except json.JSONDecodeError as e:
+        raise ValueError(
+            f"Failed to parse AWS Bedrock response for model {model}: {e}"
+        ) from e
+    except Exception as e:
+        if isinstance(e, (RuntimeError, ValueError)):
+            raise
+        raise RuntimeError(
+            f"Unexpected error calling AWS Bedrock for model {model}: {e}"
+        ) from e
