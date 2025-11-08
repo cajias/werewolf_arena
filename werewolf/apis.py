@@ -14,18 +14,18 @@
 
 import json
 import os
-from typing import Optional
+from typing import Any, Optional
 
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 from openai import OpenAI
 
 # Module-level client cache to avoid recreating clients on every call
-_bedrock_client: Optional[object] = None
+_bedrock_client: Optional[Any] = None
 _openai_client: Optional[OpenAI] = None
 
 
-def _get_bedrock_client():
+def _get_bedrock_client() -> Any:
     """Returns a cached Bedrock Runtime client."""
     global _bedrock_client
     if _bedrock_client is None:
@@ -56,7 +56,7 @@ def _get_openai_client() -> OpenAI:
     return _openai_client
 
 
-def generate(model: str, **kwargs) -> str:
+def generate(model: str, **kwargs: Any) -> str:
     """Routes model generation requests to the appropriate provider.
 
     Args:
@@ -83,7 +83,7 @@ def generate(model: str, **kwargs) -> str:
 
 
 # openai
-def generate_openai(model: str, prompt: str, json_mode: bool = True, **kwargs) -> str:
+def generate_openai(model: str, prompt: str, json_mode: bool = True, **kwargs: Any) -> str:
     """Generates text using OpenAI API.
 
     Args:
@@ -129,7 +129,7 @@ def generate_openai(model: str, prompt: str, json_mode: bool = True, **kwargs) -
 
 
 # aws bedrock
-def generate_bedrock(model: str, prompt: str, json_mode: bool = True, **kwargs) -> str:
+def generate_bedrock(model: str, prompt: str, json_mode: bool = True, **kwargs: Any) -> str:
     """Generates text using AWS Bedrock with Claude models.
 
     Args:
