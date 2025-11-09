@@ -31,23 +31,16 @@ The GitHub Actions workflow is **already configured** and will run automatically
 
 ## First Time Setup (One-Time)
 
-### For Docker Hub Publishing (Optional)
+### No Setup Required! 🎉
 
-If you want to publish the Docker image to Docker Hub:
+The workflow uses **GitHub Container Registry (ghcr.io)** which:
+- ✅ Automatically available with your GitHub repo
+- ✅ No external accounts needed
+- ✅ No secrets to configure
+- ✅ Free for public and private repos
+- ✅ Integrated with GitHub permissions
 
-1. **Create Docker Hub account**: https://hub.docker.com
-
-2. **Create access token**:
-   - Go to Account Settings → Security → New Access Token
-   - Name: "GitHub Actions"
-   - Copy the token
-
-3. **Add GitHub secrets**:
-   - Go to your repo → Settings → Secrets and variables → Actions
-   - Add `DOCKERHUB_USERNAME` (your username)
-   - Add `DOCKERHUB_TOKEN` (the token from step 2)
-
-That's it! The workflow will automatically publish on pushes to main.
+The workflow will automatically publish Docker images to `ghcr.io/YOUR_USERNAME/YOUR_REPO` on pushes to main or develop branches.
 
 ## Running Tests Locally
 
@@ -75,14 +68,25 @@ python3 test_ollama_manual.py
 python3 -m pytest tests/ -v
 ```
 
-### Option 3: Docker
+### Option 3: Docker (Local Build)
 ```bash
-# Build image
+# Build image locally
 docker build -f Dockerfile.ollama -t werewolf-test .
 
 # Run tests
 docker run --rm werewolf-test
 ```
+
+### Option 4: Docker (Pull from GitHub)
+```bash
+# Pull pre-built image from GitHub Container Registry
+docker pull ghcr.io/YOUR_USERNAME/YOUR_REPO:latest
+
+# Run tests
+docker run --rm ghcr.io/YOUR_USERNAME/YOUR_REPO:latest
+```
+
+Note: Replace `YOUR_USERNAME/YOUR_REPO` with your GitHub username and repository name.
 
 ## Selective Test Execution
 
@@ -106,6 +110,28 @@ python3 -m pytest tests/test_game.py tests/test_model.py
 - `Dockerfile.ollama` - Docker image for testing
 - `.dockerignore` - Files to exclude from Docker build
 - `test_ollama_manual.py` - Manual test script
+
+## Published Docker Images
+
+After pushing to main or develop, Docker images are automatically published to:
+
+```
+ghcr.io/YOUR_USERNAME/YOUR_REPO:latest        # Latest from main
+ghcr.io/YOUR_USERNAME/YOUR_REPO:main          # Main branch
+ghcr.io/YOUR_USERNAME/YOUR_REPO:develop       # Develop branch
+ghcr.io/YOUR_USERNAME/YOUR_REPO:main-abc1234  # Specific commit
+```
+
+### Pulling Images
+
+```bash
+# Public repo (no auth needed)
+docker pull ghcr.io/YOUR_USERNAME/YOUR_REPO:latest
+
+# Private repo (need GitHub token)
+echo $GITHUB_TOKEN | docker login ghcr.io -u YOUR_USERNAME --password-stdin
+docker pull ghcr.io/YOUR_USERNAME/YOUR_REPO:latest
+```
 
 ## Monitoring CI
 

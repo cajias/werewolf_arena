@@ -5,18 +5,20 @@ This guide explains how to run Ollama e2e tests in CI using Docker.
 ## Architecture
 
 ```
-┌─────────────────────────────────────────┐
-│         GitHub Actions Runner           │
-│                                         │
-│  ┌───────────────────────────────────┐  │
-│  │     Docker Container              │  │
-│  │                                   │  │
-│  │  ├── Ollama Server (background)  │  │
-│  │  ├── qwen:0.5b model             │  │
-│  │  ├── Python 3.11                 │  │
-│  │  └── Werewolf Arena Tests        │  │
-│  └───────────────────────────────────┘  │
-└─────────────────────────────────────────┘
+┌──────────────────────────────────────────┐
+│         GitHub Actions Runner            │
+│                                          │
+│  ┌────────────────────────────────────┐  │
+│  │     Docker Container               │  │
+│  │                                    │  │
+│  │  ├── Ollama Server (background)   │  │
+│  │  ├── qwen:0.5b model              │  │
+│  │  ├── Python 3.11                  │  │
+│  │  └── Werewolf Arena Tests         │  │
+│  └────────────────────────────────────┘  │
+│                                          │
+│  Published to: ghcr.io/user/repo        │
+└──────────────────────────────────────────┘
 ```
 
 ## Quick Start
@@ -27,7 +29,7 @@ The `.github/workflows/test-with-ollama.yml` workflow automatically:
 1. Runs unit tests without Ollama
 2. Runs e2e tests with Ollama installed directly on the runner
 3. (Optional) Builds and tests in Docker
-4. (On main branch) Publishes Docker image to Docker Hub
+4. (On main/develop) Publishes Docker image to GitHub Container Registry
 
 **No additional setup required!** Just push to GitHub.
 
@@ -47,16 +49,20 @@ docker run --rm werewolf-arena-ollama /app/run_tests.sh tests/test_e2e_ollama.py
 docker run --rm -it werewolf-arena-ollama /bin/bash
 ```
 
-### Option 3: Pull Pre-built Image from Docker Hub
+### Option 3: Pull Pre-built Image from GitHub Container Registry
 
 Once published, you can use the pre-built image:
 
 ```bash
-# Pull the image
-docker pull yourusername/werewolf-arena-ollama:latest
+# Pull the image (public repo)
+docker pull ghcr.io/yourusername/werewolf_arena:latest
 
 # Run tests
-docker run --rm yourusername/werewolf-arena-ollama
+docker run --rm ghcr.io/yourusername/werewolf_arena:latest
+
+# For private repos, authenticate first:
+echo $GITHUB_TOKEN | docker login ghcr.io -u yourusername --password-stdin
+docker pull ghcr.io/yourusername/werewolf_arena:latest
 ```
 
 ## GitHub Actions Workflow
@@ -82,34 +88,45 @@ The workflow has 4 jobs:
 - Runs tests inside the container
 - **Slow**: ~10-15 minutes (includes building image)
 
-### 4. `publish-docker-image` - Publish to Docker Hub
-- Only runs on pushes to main branch
-- Requires Docker Hub credentials
-- Publishes image for others to use
+### 4. `publish-ghcr-image` - Publish to GitHub Container Registry
+- Only runs on pushes to main or develop branches
+- No setup required (uses GITHUB_TOKEN automatically)
+- Publishes image to ghcr.io (GitHub's container registry)
 - **Fast**: ~5 minutes (uses cache)
 
-## Setting Up Docker Hub Publishing
+## GitHub Container Registry (ghcr.io)
 
-To publish the Docker image to Docker Hub:
+The workflow automatically publishes to GitHub Container Registry - **no setup required!**
 
-### 1. Create Docker Hub Account
-- Go to https://hub.docker.com
-- Create an account (free tier is fine)
+### Why GitHub Container Registry?
+- ✅ **No external accounts** - Uses your GitHub account
+- ✅ **No secrets to configure** - Uses GITHUB_TOKEN automatically
+- ✅ **Free** - Included with GitHub (public and private repos)
+- ✅ **Integrated** - Native GitHub permissions
+- ✅ **Private by default** - Control access via GitHub
 
-### 2. Create Access Token
-1. Go to Account Settings → Security
-2. Click "New Access Token"
-3. Name it "GitHub Actions"
-4. Copy the token (you won't see it again!)
+### How It Works
+1. Push to `main` or `develop` branch
+2. Workflow automatically:
+   - Builds Docker image
+   - Tags it appropriately
+   - Pushes to `ghcr.io/YOUR_USERNAME/YOUR_REPO`
+3. Image is available at `ghcr.io/YOUR_USERNAME/YOUR_REPO:latest`
 
-### 3. Add GitHub Secrets
-1. Go to your GitHub repo → Settings → Secrets and variables → Actions
-2. Add two secrets:
-   - `DOCKERHUB_USERNAME`: Your Docker Hub username
-   - `DOCKERHUB_TOKEN`: The access token from step 2
+### Making Images Public (Optional)
+By default, images are private. To make them public:
 
-### 4. Push to Main Branch
-The image will automatically build and publish!
+1. Go to your repo on GitHub
+2. Click "Packages" (right sidebar)
+3. Click on your package
+4. Click "Package settings"
+5. Scroll to "Danger Zone"
+6. Click "Change visibility" → "Public"
+
+### Viewing Published Images
+- Go to your GitHub profile
+- Click "Packages" tab
+- See all your published container images
 
 ## Docker Image Details
 
@@ -332,8 +349,8 @@ RUN for i in 1 2 3; do \
 10. Pulls qwen:0.5b (2-3 min)
 11. Runs manual test (30s)
 12. Runs all tests (1-2 min)
-13. (On main) Builds Docker image (5 min)
-14. (On main) Pushes to Docker Hub (1 min)
+13. (On main/develop) Builds Docker image (5 min)
+14. (On main/develop) Pushes to ghcr.io (1 min)
 
 Total: ~8-12 minutes
 ```
@@ -348,14 +365,15 @@ Total: ~8-12 minutes
 
 ## Next Steps
 
-1. ✅ Workflow is ready to use
-2. Set up Docker Hub secrets (optional)
-3. Push to trigger first run
-4. Monitor CI times and optimize as needed
+1. ✅ Workflow is ready to use (zero setup required!)
+2. Push to trigger first run
+3. Monitor CI times and optimize as needed
+4. (Optional) Make container images public in GitHub Packages settings
 
 ## Resources
 
 - [GitHub Actions Docs](https://docs.github.com/en/actions)
-- [Docker Hub](https://hub.docker.com)
+- [GitHub Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
 - [Ollama GitHub](https://github.com/ollama/ollama)
 - [Docker Build Push Action](https://github.com/docker/build-push-action)
+- [GitHub Packages](https://docs.github.com/en/packages)
