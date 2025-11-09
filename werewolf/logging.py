@@ -59,7 +59,7 @@ def load_game(directory: str) -> Tuple[State, List[RoundLog]]:
     return (state, logs)
 
 
-def save_game(state: State, logs: List[RoundLog], directory: str):
+def save_game(state: State, logs: List[RoundLog], directory: str) -> None:
     """Save the current game state to a specified file.
 
     This function serializes the game state to JSON and writes it to the

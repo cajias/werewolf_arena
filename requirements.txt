@@ -2,9 +2,9 @@ jinja2
 tqdm
 absl-py
 openai
+boto3
+requests
 pyyaml
-google-cloud-aiplatform
-anthropic
 marko
 pandas
 ruff

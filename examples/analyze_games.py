@@ -31,7 +31,7 @@ from pathlib import Path
 from werewolf.analysis import analyze_multiple_sessions
 
 
-def main():
+def main() -> None:
     """Analyze games from command-line arguments."""
     if len(sys.argv) < 2:
         print("Usage: python analyze_games.py <session_dir1> [session_dir2] ...")

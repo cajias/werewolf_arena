@@ -29,11 +29,11 @@ class LmLog(Deserializable):
     result: Any
 
     @classmethod
-    def from_json(cls, data: Dict[Any, Any]):
+    def from_json(cls, data: Dict[Any, Any]) -> "LmLog":
         return cls(**data)
 
 
-def format_prompt(prompt_template, worldstate) -> str:
+def format_prompt(prompt_template: str, worldstate: Dict[str, Any]) -> str:
     return jinja2.Template(prompt_template).render(worldstate)
 
 

@@ -24,7 +24,7 @@ from werewolf.model import State
 class GameStats:
     """Statistics for a single game."""
 
-    def __init__(self, state: State):
+    def __init__(self, state: State) -> None:
         """Initialize game statistics from a game state.
 
         Args:
@@ -101,11 +101,11 @@ class GameStats:
 class ExperimentAnalyzer:
     """Analyzer for multiple game experiments."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the experiment analyzer."""
         self.game_stats: List[GameStats] = []
 
-    def add_game(self, state: State):
+    def add_game(self, state: State) -> None:
         """Add a game to the analysis.
 
         Args:
@@ -191,7 +191,7 @@ class ExperimentAnalyzer:
             "model_performance": self.get_model_performance(),
         }
 
-    def save_report(self, filepath: str):
+    def save_report(self, filepath: str) -> None:
         """Save the analysis report to a JSON file.
 
         Args:
@@ -205,7 +205,7 @@ class ExperimentAnalyzer:
         with open(filepath, "w") as f:
             json.dump(report, f, indent=2)
 
-    def print_report(self):
+    def print_report(self) -> None:
         """Print a formatted summary report to console."""
         report = self.get_summary_report()
 

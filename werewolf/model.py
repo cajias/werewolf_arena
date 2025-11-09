@@ -30,7 +30,7 @@ SEER = "Seer"
 DOCTOR = "Doctor"
 
 
-def group_and_format_observations(observations):
+def group_and_format_observations(observations: List[str]) -> List[str]:
   """Groups observations by round and formats them for output.
 
   Args:
@@ -59,7 +59,7 @@ def group_and_format_observations(observations):
 # JSON serializer that works for nested classes
 class JsonEncoder(json.JSONEncoder):
 
-  def default(self, o):
+  def default(self, o: Any) -> Any:
     if isinstance(o, enum.Enum):
       return o.value
     if isinstance(o, set):
@@ -77,21 +77,21 @@ class GameView:
       round_number: int,
       current_players: List[str],
       other_wolf: Optional[str] = None,
-  ):
+  ) -> None:
     self.round_number: int = round_number
     self.current_players: List[str] = current_players
     self.debate: List[Tuple[str, str]] = []
     self.other_wolf: Optional[str] = other_wolf
 
-  def update_debate(self, author: str, dialogue: str):
+  def update_debate(self, author: str, dialogue: str) -> None:
     """Adds a new dialogue entry to the debate."""
     self.debate.append((author, dialogue))
 
-  def clear_debate(self):
+  def clear_debate(self) -> None:
     """Clears all entries from the debate."""
     self.debate.clear()
 
-  def remove_player(self, player_to_remove: str):
+  def remove_player(self, player_to_remove: str) -> None:
     """Removes a player from the list of current players."""
     if player_to_remove not in self.current_players:
       print(
@@ -104,7 +104,7 @@ class GameView:
     return to_dict(self)
 
   @classmethod
-  def from_json(cls, data: Dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]) -> "GameView":
     return cls(**data)
 
 
@@ -117,7 +117,7 @@ class Player(Deserializable):
       role: str,
       model: Optional[str] = None,
       personality: Optional[str] = "",
-  ):
+  ) -> None:
     self.name = name
     self.role = role
     self.personality = personality
@@ -127,11 +127,11 @@ class Player(Deserializable):
     self.gamestate: Optional[GameView] = None
 
   def initialize_game_view(
-      self, round_number, current_players, other_wolf=None
+      self, round_number: int, current_players: List[str], other_wolf: Optional[str] = None
   ) -> None:
     self.gamestate = GameView(round_number, current_players, other_wolf)
 
-  def _add_observation(self, observation: str):
+  def _add_observation(self, observation: str) -> None:
     """Adds an observation for the given round."""
     if not self.gamestate:
       raise ValueError(
@@ -142,7 +142,7 @@ class Player(Deserializable):
         f"Round {self.gamestate.round_number}: {observation}"
     )
 
-  def add_announcement(self, announcement: str):
+  def add_announcement(self, announcement: str) -> None:
     """Adds the current game announcement to the player's observations."""
     self._add_observation(f"Moderator Announcement: {announcement}")
 
@@ -261,7 +261,7 @@ class Player(Deserializable):
     return to_dict(self)
 
   @classmethod
-  def from_json(cls, data: Dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]) -> "Player":
     name = data["name"]
     role = data["role"]
     model = data.get("model", None)
@@ -280,13 +280,13 @@ class Villager(Player):
       name: str,
       model: Optional[str] = None,
       personality: Optional[str] = None,
-  ):
+  ) -> None:
     super().__init__(
         name=name, role=VILLAGER, model=model, personality=personality
     )
 
   @classmethod
-  def from_json(cls, data: Dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]) -> "Villager":
     name = data["name"]
     model = data.get("model", None)
     o = cls(name=name, model=model)
@@ -304,12 +304,12 @@ class Werewolf(Player):
       name: str,
       model: Optional[str] = None,
       personality: Optional[str] = None,
-  ):
+  ) -> None:
     super().__init__(
         name=name, role=WEREWOLF, model=model, personality=personality
     )
 
-  def _get_game_state(self, **kwargs) -> Dict[str, Any]:
+  def _get_game_state(self, **kwargs: Any) -> Dict[str, Any]:
     """Gets the current game state, including werewolf-specific context."""
     state = super()._get_game_state(**kwargs)
     state["werewolf_context"] = self._get_werewolf_context()
@@ -331,7 +331,7 @@ class Werewolf(Player):
     eliminate, log = self._generate_action("remove", options)
     return eliminate, log
 
-  def _get_werewolf_context(self):
+  def _get_werewolf_context(self) -> str:
     if not self.gamestate:
       raise ValueError(
           "GameView not initialized. Call initialize_game_view() first."
@@ -348,7 +348,7 @@ class Werewolf(Player):
     return context
 
   @classmethod
-  def from_json(cls, data: Dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]) -> "Werewolf":
     name = data["name"]
     model = data.get("model", None)
     o = cls(name=name, model=model)
@@ -366,7 +366,7 @@ class Seer(Player):
       name: str,
       model: Optional[str] = None,
       personality: Optional[str] = None,
-  ):
+  ) -> None:
     super().__init__(name=name, role=SEER, model=model, personality=personality)
     self.previously_unmasked: Dict[str, str] = {}
 
@@ -385,14 +385,14 @@ class Seer(Player):
     random.shuffle(options)
     return self._generate_action("investigate", options)
 
-  def reveal_and_update(self, player, role):
+  def reveal_and_update(self, player: str, role: str) -> None:
     self._add_observation(
         f"During the night, I decided to investigate {player} and learned they are a {role}."
     )
     self.previously_unmasked[player] = role
 
   @classmethod
-  def from_json(cls, data: Dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]) -> "Seer":
     name = data["name"]
     model = data.get("model", None)
     o = cls(name=name, model=model)
@@ -411,7 +411,7 @@ class Doctor(Player):
       name: str,
       model: Optional[str] = None,
       personality: Optional[str] = None,
-  ):
+  ) -> None:
     super().__init__(
         name=name, role=DOCTOR, model=model, personality=personality
     )
@@ -431,7 +431,7 @@ class Doctor(Player):
     return protected, log
 
   @classmethod
-  def from_json(cls, data: Dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]) -> "Doctor":
     name = data["name"]
     model = data.get("model", None)
     o = cls(name=name, model=model)
@@ -461,7 +461,7 @@ class Round(Deserializable):
     to_dict: Returns a dictionary representation of the round.
   """
 
-  def __init__(self):
+  def __init__(self) -> None:
     self.players: List[str] = []
     self.eliminated: Optional[str] = None
     self.unmasked: Optional[str] = None
@@ -472,11 +472,11 @@ class Round(Deserializable):
     self.bids: List[Dict[str, int]] = []
     self.success: bool = False
 
-  def to_dict(self):
+  def to_dict(self) -> Any:
     return to_dict(self)
 
   @classmethod
-  def from_json(cls, data: Dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]) -> "Round":
     o = cls()
     o.players = data["players"]
     o.eliminated = data.get("eliminated", None)
@@ -516,7 +516,7 @@ class State(Deserializable):
       doctor: Doctor,
       villagers: List[Villager],
       werewolves: List[Werewolf],
-  ):
+  ) -> None:
     self.session_id: str = session_id
     self.seer: Seer = seer
     self.doctor: Doctor = doctor
@@ -532,11 +532,11 @@ class State(Deserializable):
     self.error_message: str = ""
     self.winner: str = ""
 
-  def to_dict(self):
+  def to_dict(self) -> Any:
     return to_dict(self)
 
   @classmethod
-  def from_json(cls, data: Dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]) -> "State":
     werewolves = []
     for w in data.get("werewolves", []):
       werewolves.append(Werewolf.from_json(w))
@@ -571,16 +571,16 @@ class State(Deserializable):
 
 class VoteLog(Deserializable):
 
-  def __init__(self, player: str, voted_for: str, log: LmLog):
+  def __init__(self, player: str, voted_for: str, log: LmLog) -> None:
     self.player = player
     self.voted_for = voted_for
     self.log = log
 
-  def to_dict(self):
+  def to_dict(self) -> Any:
     return to_dict(self)
 
   @classmethod
-  def from_json(cls, data: Dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]) -> "VoteLog":
     player = data.get("player", None)
     voted_for = data.get("voted_for", None)
     log = LmLog.from_json(data.get("log", None))
@@ -611,7 +611,7 @@ class RoundLog(Deserializable):
       is the log
   """
 
-  def __init__(self):
+  def __init__(self) -> None:
     self.eliminate: Optional[LmLog] = None
     self.investigate: Optional[LmLog] = None
     self.protect: Optional[LmLog] = None
@@ -620,11 +620,11 @@ class RoundLog(Deserializable):
     self.votes: List[List[VoteLog]] = []
     self.summaries: List[Tuple[str, LmLog]] = []
 
-  def to_dict(self):
+  def to_dict(self) -> Any:
     return to_dict(self)
 
   @classmethod
-  def from_json(cls, data: Dict[Any, Any]):
+  def from_json(cls, data: Dict[Any, Any]) -> "RoundLog":
     o = cls()
 
     eliminate = data.get("eliminate", None)

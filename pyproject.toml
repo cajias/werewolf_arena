@@ -10,25 +10,41 @@ line-length = 88
 target-version = "py38"
 
 [tool.ruff.lint]
-# Enable pycodestyle (E), Pyflakes (F), isort (I), and flake8-bugbear (B)
-select = ["E", "F", "I", "B", "W", "C90"]
+# Enable pycodestyle (E), Pyflakes (F), isort (I), flake8-bugbear (B), and type annotations (ANN)
+select = ["E", "F", "I", "B", "W", "C90", "ANN"]
 ignore = [
     "E203",  # Whitespace before ':' (conflicts with Black)
     "E501",  # Line too long (handled by Black)
-    "B008",  # Do not perform function calls in argument defaults
     # Additional ignores to match flake8 configuration
     "D300",  # Use """triple double quotes"""
     "D103",  # Missing docstring in public function
     "D105",  # Missing docstring in magic method
     "D106",  # Missing docstring in public nested class
-    # Temporarily ignore these to make the build pass
-    "B904",  # Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None`
-    "C901",  # Function is too complex
-    "B024",  # Abstract base class without abstract methods
-    "B027",  # Empty method in abstract base class with no abstract decorator
-    "B019",  # Use of functools.lru_cache on methods can lead to memory leaks
-    "B007",  # Loop control variable not used within loop body
+    # Type annotation ignores
+    "ANN101",  # Missing type annotation for self in method
+    "ANN102",  # Missing type annotation for cls in classmethod
+    "ANN401",  # Dynamically typed expressions (Any) are disallowed
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# Test files don't need type annotations
+"tests/*" = ["ANN"]
+"test_*.py" = ["ANN"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["werewolf"]
+
+[tool.pytest.ini_options]
+markers = [
+    "ollama_integration: marks tests that require Ollama to be running (deselect with '-m \"not ollama_integration\"')",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+]

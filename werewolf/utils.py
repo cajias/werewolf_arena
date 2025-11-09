@@ -54,5 +54,5 @@ def parse_json_str(text: str) -> Optional[Dict[str, Any]]:
 class Deserializable(ABC):
     @classmethod
     @abstractmethod
-    def from_json(cls, data: Dict[Any, Any]):
+    def from_json(cls, data: Dict[Any, Any]) -> Any:
         pass

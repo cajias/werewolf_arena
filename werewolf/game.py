@@ -17,7 +17,7 @@
 import random
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
-from typing import List
+from typing import Any, Dict, List, Tuple
 
 import tqdm
 
@@ -25,7 +25,7 @@ from werewolf.config import MAX_DEBATE_TURNS, RUN_SYNTHETIC_VOTES
 from werewolf.model import Round, RoundLog, State, VoteLog
 
 
-def get_max_bids(d):
+def get_max_bids(d: Dict[str, Any]) -> List[str]:
   """Gets all the keys with the highest value in the dictionary."""
   max_value = max(d.values())
   max_keys = [key for key, value in d.items() if value == max_value]
@@ -56,7 +56,7 @@ class GameMaster:
   def this_round_log(self) -> RoundLog:
     return self.logs[self.current_round_num]
 
-  def eliminate(self):
+  def eliminate(self) -> None:
     """Werewolves choose a player to eliminate."""
     werewolves_alive = [
         w for w in self.state.werewolves if w.name in self.this_round.players
@@ -76,7 +76,7 @@ class GameMaster:
     else:
       raise ValueError("Eliminate did not return a valid player.")
 
-  def protect(self):
+  def protect(self) -> None:
     """Doctor chooses a player to protect."""
     if self.state.doctor.name not in self.this_round.players:
       return  # Doctor no longer in the game
@@ -90,7 +90,7 @@ class GameMaster:
     else:
       raise ValueError("Protect did not return a valid player.")
 
-  def unmask(self):
+  def unmask(self) -> None:
     """Seer chooses a player to unmask."""
     if self.state.seer.name not in self.this_round.players:
       return  # Seer no longer in the game
@@ -104,7 +104,7 @@ class GameMaster:
     else:
       raise ValueError("Unmask function did not return a valid player.")
 
-  def _get_bid(self, player_name):
+  def _get_bid(self, player_name: str) -> Tuple[int, Any]:
     """Gets the bid for a specific player."""
     player = self.state.players[player_name]
     bid, log = player.bid()
@@ -117,7 +117,7 @@ class GameMaster:
       tqdm.tqdm.write(f"{player_name} bid: {bid}")
     return bid, log
 
-  def get_next_speaker(self):
+  def get_next_speaker(self) -> str:
     """Determine the next speaker based on bids."""
     previous_speaker, previous_dialogue = (
         self.this_round.debate[-1] if self.this_round.debate else (None, None)
@@ -154,7 +154,7 @@ class GameMaster:
     random.shuffle(potential_speakers)
     return random.choice(potential_speakers)
 
-  def run_summaries(self):
+  def run_summaries(self) -> None:
     """Collect summaries from players after the debate."""
 
     with ThreadPoolExecutor(max_workers=self.num_threads) as executor:
@@ -168,7 +168,7 @@ class GameMaster:
         tqdm.tqdm.write(f"{player_name} summary: {summary}")
         self.this_round_log.summaries.append((player_name, log))
 
-  def run_day_phase(self):
+  def run_day_phase(self) -> None:
     """Run the day phase which consists of the debate and voting."""
 
     for idx in range(MAX_DEBATE_TURNS):
@@ -202,7 +202,7 @@ class GameMaster:
     for player, vote in self.this_round.votes[-1].items():
       tqdm.tqdm.write(f"{player} voted to remove {vote}")
 
-  def run_voting(self):
+  def run_voting(self) -> Tuple[Dict[str, str], List[VoteLog]]:
     """Conduct a vote among players to exile someone."""
     vote_log = []
     votes = {}
@@ -226,7 +226,7 @@ class GameMaster:
 
     return votes, vote_log
 
-  def exile(self):
+  def exile(self) -> None:
     """Exile the player who received the most votes."""
 
     most_voted, vote_count = Counter(
@@ -256,7 +256,7 @@ class GameMaster:
 
     tqdm.tqdm.write(announcement)
 
-  def resolve_night_phase(self):
+  def resolve_night_phase(self) -> None:
     """Resolve elimination and protection during the night phase."""
     if self.this_round.eliminated != self.this_round.protected:
       eliminated_player = self.this_round.eliminated
@@ -275,7 +275,7 @@ class GameMaster:
         player.gamestate.remove_player(self.this_round.eliminated)
       player.add_announcement(announcement)
 
-  def run_round(self):
+  def run_round(self) -> None:
     """Run a single round of the game."""
     self.state.rounds.append(Round())
     self.logs.append(RoundLog())
@@ -321,7 +321,7 @@ class GameMaster:
       return "Werewolves"
     return "Villagers" if not active_wolves else ""
 
-  def check_for_winner(self):
+  def check_for_winner(self) -> None:
     """Check if there is a winner and update the state accordingly."""
     self.state.winner = self.get_winner()
     if self.state.winner:
