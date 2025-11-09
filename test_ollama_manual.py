@@ -26,17 +26,17 @@ def test_ollama_connection() -> bool:
             json_mode=True,
             max_tokens=50,
         )
-        print(f"✓ Ollama connection successful!")
+        print("✓ Ollama connection successful!")
         print(f"  Response: {response[:100]}...")
         return True
     except RuntimeError as e:
         if "Could not connect to Ollama server" in str(e):
-            print(f"✗ Ollama server is not running")
-            print(f"  Start it with: ollama serve")
+            print("✗ Ollama server is not running")
+            print("  Start it with: ollama serve")
             return False
         elif "model may not be available" in str(e):
-            print(f"✗ Model not available")
-            print(f"  Pull it with: ollama pull qwen:0.5b")
+            print("✗ Model not available")
+            print("  Pull it with: ollama pull qwen:0.5b")
             return False
         else:
             print(f"✗ Unexpected error: {e}")
@@ -55,7 +55,7 @@ def test_ollama_with_game() -> bool:
             werewolf_model="ollama:qwen:0.5b",
         )
 
-        print(f"✓ Players initialized successfully!")
+        print("✓ Players initialized successfully!")
         print(f"  Seer: {seer.name} ({seer.model})")
         print(f"  Doctor: {doctor.name} ({doctor.model})")
         print(f"  Werewolves: {[w.name for w in werewolves]}")

@@ -26,6 +26,11 @@ ignore = [
     "ANN401",  # Dynamically typed expressions (Any) are disallowed
 ]
 
+[tool.ruff.lint.per-file-ignores]
+# Test files don't need type annotations
+"tests/*" = ["ANN"]
+"test_*.py" = ["ANN"]
+
 [tool.ruff.lint.isort]
 known-first-party = ["werewolf"]
 
