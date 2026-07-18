@@ -23,6 +23,7 @@ from werewolf.game import GameMaster
 from werewolf.model import Doctor, Seer, State, Villager, Werewolf
 from werewolf.runner import initialize_players
 
+
 class TestOllamaE2E:
     """End-to-end tests using Ollama models (mocked)."""
 

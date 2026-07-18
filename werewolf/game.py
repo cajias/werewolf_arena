@@ -24,6 +24,7 @@ import tqdm
 from werewolf.config import MAX_DEBATE_TURNS, RUN_SYNTHETIC_VOTES
 from werewolf.model import Round, RoundLog, State, VoteLog
 
+
 def get_max_bids(d: Dict[str, Any]) -> List[str]:
     """Gets all the keys with the highest value in the dictionary."""
     max_value = max(d.values())
@@ -246,9 +247,7 @@ class GameMaster:
         if self.this_round.eliminated != self.this_round.protected:
             eliminated_player = self.this_round.eliminated
             self.this_round.players.remove(eliminated_player)
-            announcement = (
-                f"The Werewolves removed {eliminated_player} from the game during the night."
-            )
+            announcement = f"The Werewolves removed {eliminated_player} from the game during the night."
         else:
             announcement = "No one was removed from the game during the night."
         tqdm.tqdm.write(announcement)

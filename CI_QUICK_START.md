@@ -2,7 +2,7 @@
 
 This project includes automated CI testing with Ollama for running e2e tests without API keys.
 
-## 🚀 Ready to Use!
+## 🚀 Ready to Use
 
 The GitHub Actions workflow is **already configured** and will run automatically on:
 
@@ -12,7 +12,7 @@ The GitHub Actions workflow is **already configured** and will run automatically
 
 ## What Happens in CI
 
-```
+```text
 ┌─────────────────────────────────────────────┐
 │  1. Unit Tests (2-3 min)                    │
 │     ✓ Linting with ruff                     │
@@ -42,7 +42,8 @@ The workflow uses **GitHub Container Registry (ghcr.io)** which:
 - ✅ Free for public and private repos
 - ✅ Integrated with GitHub permissions
 
-The workflow will automatically publish Docker images to `ghcr.io/YOUR_USERNAME/YOUR_REPO` on pushes to main or develop branches.
+The workflow will automatically publish Docker images to
+`ghcr.io/YOUR_USERNAME/YOUR_REPO` on pushes to main or develop branches.
 
 ## Running Tests Locally
 
@@ -121,7 +122,7 @@ python3 -m pytest tests/test_game.py tests/test_model.py
 
 After pushing to main or develop, Docker images are automatically published to:
 
-```
+```text
 ghcr.io/YOUR_USERNAME/YOUR_REPO:latest        # Latest from main
 ghcr.io/YOUR_USERNAME/YOUR_REPO:main          # Main branch
 ghcr.io/YOUR_USERNAME/YOUR_REPO:develop       # Develop branch
@@ -198,7 +199,7 @@ To use different models in CI, edit `.github/workflows/test-with-ollama.yml`:
 
 ## Files Created
 
-```
+```text
 werewolf_arena/
 ├── .github/
 │   └── workflows/

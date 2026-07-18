@@ -21,6 +21,7 @@ from werewolf import apis, utils
 from werewolf.config import RETRIES
 from werewolf.utils import Deserializable
 
+
 @dataclasses.dataclass
 class LmLog(Deserializable):
     prompt: str

@@ -31,6 +31,7 @@ from werewolf.model import (
     group_and_format_observations,
 )
 
+
 class TestGameView:
     """Tests for the GameView class."""
 

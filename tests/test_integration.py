@@ -17,6 +17,7 @@
 from werewolf.config import get_player_names
 from werewolf.model import Doctor, Round, Seer, State, Villager, Werewolf
 
+
 class TestGameFlow:
     """Integration tests for complete game workflows."""
 

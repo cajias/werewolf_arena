@@ -17,6 +17,7 @@
 from werewolf.game import GameMaster, get_max_bids
 from werewolf.model import Round, RoundLog
 
+
 class TestGetMaxBids:
     """Tests for the get_max_bids helper function."""
 

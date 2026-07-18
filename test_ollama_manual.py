@@ -14,6 +14,7 @@ import sys
 
 from werewolf.apis import generate_ollama
 
+
 def test_ollama_connection() -> bool:
     """Test if Ollama server is running and accessible."""
     print("Testing Ollama connection...")

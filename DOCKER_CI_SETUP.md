@@ -4,7 +4,7 @@ This guide explains how to run Ollama e2e tests in CI using Docker.
 
 ## Architecture
 
-```
+```text
 ┌──────────────────────────────────────────┐
 │         GitHub Actions Runner            │
 │                                          │
@@ -320,7 +320,7 @@ ollama rm qwen:0.5b
 - run: python3 -m pytest --timeout=600 # 10 minute timeout
 ```
 
-3. Reduce test complexity
+1. Reduce test complexity
 
 ### "Docker build fails"
 

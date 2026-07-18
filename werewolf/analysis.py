@@ -20,6 +20,7 @@ from typing import Any, Dict, List, Optional
 
 from werewolf.model import State
 
+
 class GameStats:
     """Statistics for a single game."""
 

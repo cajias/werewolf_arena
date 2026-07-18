@@ -65,6 +65,7 @@ ignore = [
     "E501",
     "EM101",
     "EM102",
+    "ISC001",
     "PLC0415",
     "PLR0913",
     "PLW0603",
@@ -103,7 +104,6 @@ max-statements = 50
 [tool.ruff.lint.isort]
 known-first-party = ["werewolf"]
 force-single-line = false
-lines-after-imports = 1
 
 [tool.black]
 line-length = 120

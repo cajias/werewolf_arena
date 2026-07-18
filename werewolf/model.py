@@ -339,8 +339,7 @@ class Werewolf(Player):
             context = f"\n- The other Werewolf is {self.gamestate.other_wolf}."
         else:
             context = (
-                f"\n- The other Werewolf, {self.gamestate.other_wolf}, was exiled by the Villagers. "
-                "Only you remain."
+                f"\n- The other Werewolf, {self.gamestate.other_wolf}, was exiled by the Villagers. " "Only you remain."
             )
 
         return context

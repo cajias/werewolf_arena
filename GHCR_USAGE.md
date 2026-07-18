@@ -1,6 +1,7 @@
 # Using Pre-built Docker Images from GitHub Container Registry
 
-This project automatically publishes Docker images to GitHub Container Registry (ghcr.io) on every push to `main` or `develop` branches.
+This project automatically publishes Docker images to GitHub Container Registry
+(ghcr.io) on every push to `main` or `develop` branches.
 
 ## Quick Start
 

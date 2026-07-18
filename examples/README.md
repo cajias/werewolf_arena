@@ -91,7 +91,8 @@ To view a completed game in the interactive viewer:
    ```
 
 3. Open in your browser:
-   ```
+
+   ```text
    http://localhost:8080/?session_id=session_20240610_084702
    ```
 
@@ -111,6 +112,8 @@ See the `run_experiments.sh` file for a sample batch experiment script.
    python3 main.py --run --v_models=pro1.5 --w_models=gpt4 --threads=4
    ```
 
-3. **Reproducibility**: Games use random player assignments. For reproducible results, you may want to run multiple games and analyze the aggregate statistics.
+3. **Reproducibility**: Games use random player assignments. For reproducible results,
+   you may want to run multiple games and analyze the aggregate statistics.
 
-4. **Cost Management**: Running many games with GPT-4 can be expensive. Start with smaller evaluations or use GPT-3.5 for testing.
+4. **Cost Management**: Running many games with GPT-4 can be expensive. Start with
+   smaller evaluations or use GPT-3.5 for testing.

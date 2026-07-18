@@ -19,6 +19,7 @@ from typing import List, Tuple
 
 from werewolf.model import RoundLog, State, to_dict
 
+
 def log_directory() -> str:
     pacific_timezone = datetime.timezone(datetime.timedelta(hours=-8))
     timestamp = datetime.datetime.now(pacific_timezone).strftime("%Y%m%d_%H%M%S")

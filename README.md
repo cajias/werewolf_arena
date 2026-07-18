@@ -1,4 +1,4 @@
-```
+```text
 __        __                              _  __    _
 \ \      / /__ _ __ _____      _____  | |/ _|  / \   _ __ ___ _ __   __ _
  \ \ /\ / / _ \ '__/ _ \ \ /\ / / _ \ | | |_  / _ \ | '__/ _ \ '_ \ / _` |
@@ -124,7 +124,7 @@ npm run start
 
 ## 🗂️ Project Structure
 
-```
+```text
 werewolf_arena/
 ├── main.py               # CLI entrypoint (absl flags → werewolf.runner.run)
 ├── werewolf/             # Core game engine package

@@ -181,6 +181,7 @@ ollama pull qwen:0.5b
    ```
 
 3. **Reduce parallelism**:
+
    ```bash
    # Run with fewer threads
    python3 main.py --run --threads=1 --v_models=qwen --w_models=qwen
@@ -234,7 +235,7 @@ model_to_id = {
 }
 ```
 
-2. Update the CLI help text:
+1. Update the CLI help text:
 
 ```python
 _VILLAGER_MODELS = flags.DEFINE_list(
@@ -244,13 +245,13 @@ _VILLAGER_MODELS = flags.DEFINE_list(
 )
 ```
 
-3. Pull the model:
+1. Pull the model:
 
 ```bash
 ollama pull mistral
 ```
 
-4. Use it:
+1. Use it:
 
 ```bash
 python3 main.py --run --v_models=mistral --w_models=codellama
@@ -258,7 +259,7 @@ python3 main.py --run --v_models=mistral --w_models=codellama
 
 ## Resources
 
-- **Ollama Website**: https://ollama.com
-- **Ollama GitHub**: https://github.com/ollama/ollama
-- **Model Library**: https://ollama.com/library
-- **Ollama API Docs**: https://github.com/ollama/ollama/blob/main/docs/api.md
+- **Ollama Website**: <https://ollama.com>
+- **Ollama GitHub**: <https://github.com/ollama/ollama>
+- **Model Library**: <https://ollama.com/library>
+- **Ollama API Docs**: <https://github.com/ollama/ollama/blob/main/docs/api.md>
