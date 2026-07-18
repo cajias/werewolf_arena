@@ -108,7 +108,8 @@ def generate_openai(
         RuntimeError: If API key is not configured or API call fails
         ValueError: If response is invalid
     """
-    del kwargs
+    # Keep backend signatures aligned so the dispatcher can forward shared kwargs.
+    _ = kwargs
     if not prompt:
         raise ValueError("Prompt parameter cannot be empty")
 
@@ -142,7 +143,7 @@ def generate_openai(
 def generate_bedrock(
     model: str,
     prompt: str,
-    _json_mode: bool = True,
+    json_mode: bool = True,
     **kwargs: Any,
 ) -> str:
     """Generates text using AWS Bedrock with Claude models.
@@ -162,6 +163,8 @@ def generate_bedrock(
         RuntimeError: If AWS credentials are not configured or API call fails
         ValueError: If prompt is empty or response is invalid
     """
+    # Bedrock ignores JSON mode today, but the parameter is kept for signature parity.
+    _ = json_mode
     if not prompt:
         raise ValueError("Prompt parameter cannot be empty")
 
