@@ -20,13 +20,31 @@ jobs:
       with:
         python-version: '3.11'
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
+        pip install -r requirements-lint.txt
+        npm ci
 
-    - name: Run linter
+    - name: Run Python linters
       run: |
-        ruff check werewolf/ main.py examples/
+        ruff check .
+        black --check .
+        mypy
+        pylint --disable=all --enable=duplicate-code main.py werewolf
+
+    - name: Run frontend linters
+      run: |
+        npm run lint:md
+        npm run format:check
+        npm run lint:ts
+        npm run build
 
     - name: Run unit and mocked tests
       run: |

@@ -6,33 +6,172 @@ readme = "README.md"
 requires-python = ">=3.8"
 
 [tool.ruff]
-line-length = 88
+line-length = 120
 target-version = "py38"
 
 [tool.ruff.lint]
-# Enable pycodestyle (E), Pyflakes (F), isort (I), flake8-bugbear (B), and type annotations (ANN)
-select = ["E", "F", "I", "B", "W", "C90", "ANN"]
+select = [
+    "E",
+    "F",
+    "I",
+    "B",
+    "W",
+    "C90",
+    "SIM",
+    "PIE",
+    "PLR",
+    "RET",
+    "ANN",
+    "UP",
+    "D",
+    "N",
+    "S",
+    "BLE",
+    "A",
+    "COM",
+    "C4",
+    "DTZ",
+    "T10",
+    "EM",
+    "ISC",
+    "ICN",
+    "G",
+    "INP",
+    "PT",
+    "Q",
+    "RSE",
+    "SLOT",
+    "TID",
+    "TCH",
+    "ARG",
+    "PTH",
+    "ERA",
+    "PGH",
+    "PL",
+    "TRY",
+    "FLY",
+    "PERF",
+    "RUF",
+]
 ignore = [
-    "E203",  # Whitespace before ':' (conflicts with Black)
-    "E501",  # Line too long (handled by Black)
-    # Additional ignores to match flake8 configuration
-    "D300",  # Use """triple double quotes"""
-    "D103",  # Missing docstring in public function
-    "D105",  # Missing docstring in magic method
-    "D106",  # Missing docstring in public nested class
-    # Type annotation ignores
-    "ANN101",  # Missing type annotation for self in method
-    "ANN102",  # Missing type annotation for cls in classmethod
-    "ANN401",  # Dynamically typed expressions (Any) are disallowed
+    "ANN401",
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D107",
+    "E203",
+    "E501",
+    "EM101",
+    "EM102",
+    "PLC0415",
+    "PLR0913",
+    "PLW0603",
+    "PTH103",
+    "PTH107",
+    "PTH109",
+    "PTH110",
+    "PTH119",
+    "PTH123",
+    "S311",
+    "TRY003",
 ]
 
 [tool.ruff.lint.per-file-ignores]
-# Test files don't need type annotations
-"tests/*" = ["ANN"]
-"test_*.py" = ["ANN"]
+"tests/**/*.py" = ["ANN001", "ANN201", "PLR2004", "S101"]
+"**/test_*.py" = ["ANN001", "ANN201", "PLR2004", "S101"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.pylint]
+max-args = 5
+max-branches = 12
+max-returns = 6
+max-statements = 50
 
 [tool.ruff.lint.isort]
 known-first-party = ["werewolf"]
+force-single-line = false
+lines-after-imports = 1
+
+[tool.black]
+line-length = 120
+target-version = ["py38"]
+
+[tool.mypy]
+python_version = "3.8"
+files = ["main.py", "werewolf"]
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+strict_equality = true
+strict = true
+show_error_codes = true
+show_column_numbers = true
+pretty = true
+
+[[tool.mypy.overrides]]
+module = [
+    "absl.*",
+    "boto3.*",
+    "jinja2.*",
+    "marko.*",
+    "openai.*",
+    "pandas.*",
+    "requests.*",
+    "tqdm.*",
+    "yaml.*",
+]
+ignore_missing_imports = true
+
+[tool.pylint.main]
+enable = ["all"]
+min-similarity-lines = 4
+ignore-imports = true
+load-plugins = []
+
+[tool.pylint.messages_control]
+disable = [
+    "C0114",
+    "C0115",
+    "C0116",
+    "R0903",
+    "W0212",
+]
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint.similarities]
+min-similarity-lines = 4
+ignore-comments = true
+ignore-docstrings = true
+ignore-imports = true
+
+[tool.pylint.basic]
+good-names = ["i", "j", "k", "ex", "Run", "_", "id"]
+const-rgx = "^([A-Z_][A-Z0-9_]*|__.*__|log)$"
+
+[tool.pylint.design]
+max-args = 5
+max-locals = 15
+max-returns = 6
+max-branches = 12
+max-statements = 50
+max-parents = 7
+max-attributes = 7
+min-public-methods = 1
+max-public-methods = 20
 
 [tool.pytest.ini_options]
 markers = [

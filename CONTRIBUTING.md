@@ -30,3 +30,16 @@ Guidelines](https://opensource.google/conduct/).
 All submissions, including submissions by project members, require review. We
 use [GitHub pull requests](https://docs.github.com/articles/about-pull-requests)
 for this purpose.
+
+## Local quality checks
+
+Before opening a pull request, run the repository quality checks locally:
+
+```bash
+ruff check .
+black --check .
+mypy
+pylint --disable=all --enable=duplicate-code main.py werewolf
+npm run lint
+pytest -m "not ollama_integration"
+```

@@ -158,8 +158,15 @@ pytest
 # With coverage
 pytest --cov=werewolf
 
-# Lint
+# Python lint
 ruff check .
+black --check .
+mypy
+pylint --disable=all --enable=duplicate-code main.py werewolf
+
+# Markdown / formatting / TypeScript lint
+npm run lint
+npm run lint:ts
 
 # Build the TypeScript viewer
 npm run build
@@ -171,8 +178,8 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md), [`OLLAMA_SETUP.md`](OLLAMA_SETUP.md),
 ## 🤝 Contributing
 
 Contributions are welcome. Fork the repo, create a feature branch, keep the test suite
-green (`pytest -m "not ollama_integration"`) and lint clean (`ruff check .`), then open a
-pull request. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for details.
+green (`pytest -m "not ollama_integration"`) and lint clean (`ruff check . && black --check . && mypy && npm run lint`),
+then open a pull request. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for details.
 
 ## 📄 License
 
