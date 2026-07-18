@@ -31,7 +31,9 @@ _RUN_GAME = flags.DEFINE_boolean("run", False, "Runs a single game.")
 _RESUME = flags.DEFINE_boolean("resume", False, "Resumes games.")
 _EVAL = flags.DEFINE_boolean("eval", False, "Collect eval data by running many games.")
 _NUM_GAMES = flags.DEFINE_integer(
-    "num_games", 2, "Number of games to run used with eval."
+    "num_games",
+    2,
+    "Number of games to run used with eval.",
 )
 _VILLAGER_MODELS = flags.DEFINE_list(
     "v_models",
@@ -44,12 +46,15 @@ _WEREWOLF_MODELS = flags.DEFINE_list(
     "The model used for werewolves values are: gpt4, gpt4o, gpt3.5, claude3-sonnet, claude3-haiku, claude3-opus, deepseek-r1, llama2, qwen",
 )
 _ARENA = flags.DEFINE_boolean(
-    "arena", False, "Only run games using different models for villagers and werewolves"
+    "arena",
+    False,
+    "Only run games using different models for villagers and werewolves",
 )
 _THREADS = flags.DEFINE_integer("threads", 2, "Number of threads to run.")
 
 DEFAULT_WEREWOLF_MODELS = ["gpt4o"]
 DEFAULT_VILLAGER_MODELS = ["gpt4o"]
+WEREWOLF_PAIR_COUNT = 2
 RESUME_DIRECTORIES = []
 
 model_to_id = {
@@ -67,36 +72,27 @@ model_to_id = {
 
 
 def initialize_players(
-    villager_model: str, werewolf_model: str
+    villager_model: str,
+    werewolf_model: str,
 ) -> Tuple[Seer, Doctor, List[Villager], List[Werewolf]]:
     """Assigns roles to players and initializes their game view."""
-
     player_names = get_player_names()
     random.shuffle(player_names)
 
     seer = Seer(
         name=player_names.pop(),
         model=villager_model,
-        # personality="You are cunning.",
     )
     doctor = Doctor(name=player_names.pop(), model=villager_model)
-    werewolves = [
-        Werewolf(name=player_names.pop(), model=werewolf_model) for _ in range(2)
-    ]
+    werewolves = [Werewolf(name=player_names.pop(), model=werewolf_model) for _ in range(2)]
     villagers = [Villager(name=name, model=villager_model) for name in player_names]
 
     # Initialize game view for all players
-    for player in [seer, doctor] + werewolves + villagers:
-        other_wolf = (
-            next((w.name for w in werewolves if w != player), None)
-            if isinstance(player, Werewolf)
-            else None
-        )
+    for player in [seer, doctor, *werewolves, *villagers]:
+        other_wolf = next((w.name for w in werewolves if w != player), None) if isinstance(player, Werewolf) else None
         tqdm.tqdm.write(f"{player.name} has role {player.role}")
         player.initialize_game_view(
-            current_players=player_names
-            + [seer.name, doctor.name]
-            + [w.name for w in werewolves],
+            current_players=player_names + [seer.name, doctor.name] + [w.name for w in werewolves],
             round_number=0,
             other_wolf=other_wolf,
         )
@@ -158,11 +154,7 @@ def _resume_from_existing_rounds(state: State) -> List[Werewolf]:
         )
 
         # Remove the observation from the failed round for all active players
-        player.observations = [
-            o
-            for o in player.observations
-            if not o.startswith(f"Round {failed_round}")
-        ]
+        player.observations = [o for o in player.observations if not o.startswith(f"Round {failed_round}")]
 
         if player.role == WEREWOLF:
             werewolves.append(player)
@@ -175,7 +167,7 @@ def _resume_from_existing_rounds(state: State) -> List[Werewolf]:
 
 def _set_werewolf_partners(werewolves: List[Werewolf]) -> None:
     """Sets the other_wolf reference for werewolf partners."""
-    if len(werewolves) == 2:
+    if len(werewolves) == WEREWOLF_PAIR_COUNT:
         werewolves[0].gamestate.other_wolf = werewolves[1].name
         werewolves[1].gamestate.other_wolf = werewolves[0].name
 
@@ -185,10 +177,7 @@ def resume_game(directory: str) -> bool:
 
     _remove_failed_round(state, logs)
 
-    if not state.rounds:
-        werewolves = _initialize_fresh_game(state)
-    else:
-        werewolves = _resume_from_existing_rounds(state)
+    werewolves = _initialize_fresh_game(state) if not state.rounds else _resume_from_existing_rounds(state)
 
     _set_werewolf_partners(werewolves)
 
@@ -222,7 +211,7 @@ def resume_games(directories: List[str]) -> None:
     print(
         f"Successful resumes: {successful_resumes}.\nFailed resumes:"
         f" {failed_resumes}\nInvalid resumes(no partial game found):"
-        f" {invalid_resumes}"
+        f" {invalid_resumes}",
     )
 
 
@@ -235,7 +224,8 @@ def run_game(
     Returns: (winner, log_dir)
     """
     seer, doctor, villagers, werewolves = initialize_players(
-        villager_model, werewolf_model
+        villager_model,
+        werewolf_model,
     )
     # Generate unique session ID based on timestamp
     log_directory = logging.log_directory()
@@ -283,8 +273,7 @@ def run() -> None:
             if villager_model == werewolf_model and _ARENA.value:
                 continue
             print(
-                f"Running games with Villagers: {villager_model} and"
-                f" Werewolves:{werewolf_model}"
+                f"Running games with Villagers: {villager_model} and Werewolves:{werewolf_model}",
             )
             for _ in tqdm.tqdm(range(_NUM_GAMES.value), desc="Games"):
                 winner, log_dir = run_game(
@@ -294,7 +283,8 @@ def run() -> None:
                 results.append([villager_model, werewolf_model, winner, log_dir])
 
         df = pd.DataFrame(
-            results, columns=["VillagerModel", "WerewolfModel", "Winner", "Log"]
+            results,
+            columns=["VillagerModel", "WerewolfModel", "Winner", "Log"],
         )
         print("######## Eval results ########")
         print(df)

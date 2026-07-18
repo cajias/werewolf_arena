@@ -14,7 +14,6 @@ import sys
 
 from werewolf.apis import generate_ollama
 
-
 def test_ollama_connection() -> bool:
     """Test if Ollama server is running and accessible."""
     print("Testing Ollama connection...")
@@ -28,19 +27,18 @@ def test_ollama_connection() -> bool:
         )
         print("✓ Ollama connection successful!")
         print(f"  Response: {response[:100]}...")
-        return True
     except RuntimeError as e:
         if "Could not connect to Ollama server" in str(e):
             print("✗ Ollama server is not running")
             print("  Start it with: ollama serve")
             return False
-        elif "model may not be available" in str(e):
+        if "model may not be available" in str(e):
             print("✗ Model not available")
             print("  Pull it with: ollama pull qwen:0.5b")
             return False
-        else:
-            print(f"✗ Unexpected error: {e}")
-            return False
+        print(f"✗ Unexpected error: {e}")
+        return False
+    return True
 
 
 def test_ollama_with_game() -> bool:
@@ -60,10 +58,10 @@ def test_ollama_with_game() -> bool:
         print(f"  Doctor: {doctor.name} ({doctor.model})")
         print(f"  Werewolves: {[w.name for w in werewolves]}")
         print(f"  Villagers: {[v.name for v in villagers]}")
-        return True
     except Exception as e:
         print(f"✗ Failed to initialize game: {e}")
         return False
+    return True
 
 
 def main() -> None:

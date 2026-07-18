@@ -22,33 +22,28 @@ class Demo {
   constructor() {
     this.url = new URLSearchParams(window.location.search);
     this.session_id = this.url.get('session_id') || '';
-    if (this.session_id.length == 0) throw new Error('No session specified');
+    if (this.session_id.length === 0) throw new Error('No session specified');
   }
 
   async retrieve_data() {
     // game log
     const logs_response = await fetch(`http://localhost:8080/logs/${this.session_id}/game_logs.json`);
     const logs = await logs_response.json();
-    console.log("logs", logs)
-
+    console.log('logs', logs);
 
     // game state
     let state_response = await fetch(`http://localhost:8080/logs/${this.session_id}/game_complete.json`);
 
     if (state_response.status == 404) {
       state_response = await fetch(`http://localhost:8080/logs/${this.session_id}/game_partial.json`);
-      console.log("loaded partial file because game_complete.json is not available.")
+      console.log('loaded partial file because game_complete.json is not available.');
     }
     const state = await state_response.json();
-    console.log("state", state)
+    console.log('state', state);
 
-    this.data = { logs: logs, state: state };
+    this.data = { logs, state };
     for (let i = 0; i < this.data['logs'].length; i++) {
-      this.process_logs(
-        this.data['logs'][i],
-        this.data['state']['rounds'][i],
-        i,
-      );
+      this.process_logs(this.data['logs'][i], this.data['state']['rounds'][i], i);
     }
     this.process_state(this.data['state']);
   }
@@ -61,7 +56,7 @@ class Demo {
     // uiManager.add_ablations();
     uiManager.add_game_file(this.session_id);
 
-    let players = Object.keys(state['players']);
+    const players = Object.keys(state['players']);
     for (const player of players) {
       uiManager.add_player(state['players'][player]);
     }
@@ -97,10 +92,10 @@ class Demo {
     }
 
     if (data['votes'].length > 0) {
-      console.log(round_info.players)
+      console.log(round_info.players);
 
-      let all_players = round_info.players.concat(round_info.exiled);
-      console.log(all_players)
+      const all_players = round_info.players.concat(round_info.exiled);
+      console.log(all_players);
       uiManager.add_votes(data['votes'], all_players);
       uiManager.add_exiled(round_info['exiled']);
       uiManager.add_summaries(data['summaries']);
@@ -116,9 +111,7 @@ class UIManager {
 
   constructor() {
     this.player_container = document.getElementById('player-container')!;
-    this.transcript_container = document.getElementById(
-      'transcript-container',
-    )!;
+    this.transcript_container = document.getElementById('transcript-container')!;
     this.debug_container = document.getElementById('debug-container')!;
     this.active_element = null;
   }
@@ -126,7 +119,7 @@ class UIManager {
   add_round_header(round: number, phase: string) {
     const header = document.createElement('h3');
     header.textContent = `Round ${round}: ${phase}`;
-    header.classList.add('round-header', 'round-' + phase, 'round-' + round);
+    header.classList.add('round-header', `round-${phase}`, `round-${round}`);
     this.transcript_container.append(header);
   }
 
@@ -159,13 +152,10 @@ class UIManager {
     const ww_ablations = document.createElement('div');
     ww_ablations.textContent += 'Werewolves: ';
     if (demo.data['state']['werewolves'][0]['ablations'] != null) {
-      const ww_ablation_keys = Object.keys(
-        demo.data['state']['werewolves'][0]['ablations'],
-      );
+      const ww_ablation_keys = Object.keys(demo.data['state']['werewolves'][0]['ablations']);
       for (const ablation of ww_ablation_keys) {
         const ab_element = document.createElement('span');
-        const value =
-          demo.data['state']['werewolves'][0]['ablations'][ablation];
+        const value = demo.data['state']['werewolves'][0]['ablations'][ablation];
         ab_element.textContent = `${ablation}: ${value}, `;
         ww_ablations.appendChild(ab_element);
       }
@@ -177,18 +167,18 @@ class UIManager {
   }
 
   add_bids(bids: any[]) {
-    let bid_container = document.createElement('div');
+    const bid_container = document.createElement('div');
     bid_container.classList.add('bidding');
     if (bids === undefined) return;
 
-    const max_value = 4.0;
-    const max_bar_height = 100.0;
+    const max_value = 4;
+    const max_bar_height = 100;
 
     for (const bid of bids) {
       const player_container = document.createElement('div');
-      const bid_int = parseFloat(bid[1]['result']['bid']);
+      const bid_int = Number.parseFloat(bid[1]['result']['bid']);
 
-      let barHeight = (bid_int / max_value) * max_bar_height;
+      const barHeight = (bid_int / max_value) * max_bar_height;
       const bar = document.createElement('div');
       const bar_icon = document.createElement('img');
       bar_icon.src = `static/${bid[0]}.png`;
@@ -197,7 +187,7 @@ class UIManager {
       bar.style.height = `${barHeight}px`;
       bar.classList.add('bid-bar');
       bar.classList.add(`bar-${bid_int}`);
-      bar.classList.add(this.get_role_from_name(bid[0]) + '-short');
+      bar.classList.add(`${this.get_role_from_name(bid[0])}-short`);
 
       const player_icon = document.createElement('img');
       player_icon.src = `static/${bid[0]}.png`;
@@ -251,31 +241,19 @@ class UIManager {
   }
 
   add_roles(eliminate: any, investigate: any, protect: any) {
-    let special_container = document.createElement('div');
+    const special_container = document.createElement('div');
     special_container.classList.add('special');
 
-    const ww_container = this.create_special_container(
-      eliminate,
-      'Werewolf',
-      'remove',
-    );
+    const ww_container = this.create_special_container(eliminate, 'Werewolf', 'remove');
     special_container.append(ww_container);
 
     if (investigate != null) {
-      const seer_container = this.create_special_container(
-        investigate,
-        'Seer',
-        'investigate',
-      );
+      const seer_container = this.create_special_container(investigate, 'Seer', 'investigate');
       special_container.append(seer_container);
     }
 
     if (protect != null) {
-      const protect_container = this.create_special_container(
-        protect,
-        'Doctor',
-        'protect',
-      );
+      const protect_container = this.create_special_container(protect, 'Doctor', 'protect');
       special_container.append(protect_container);
     }
 
@@ -309,15 +287,15 @@ class UIManager {
 
   add_debate(debate: any) {
     if (debate == null) return;
-    let debate_container = document.createElement('div');
+    const debate_container = document.createElement('div');
     debate_container.classList.add('debate');
-    let debate_name = document.createElement('p');
-    let debate_thinking = document.createElement('p');
-    let debate_icon = document.createElement('img');
+    const debate_name = document.createElement('p');
+    const debate_thinking = document.createElement('p');
+    const debate_icon = document.createElement('img');
     const name_and_image = document.createElement('div');
     name_and_image.classList.add('name-and-image');
     debate_thinking.classList.add('thinking');
-    let debate_say = document.createElement('p');
+    const debate_say = document.createElement('p');
 
     const hidden_info = document.createElement('div');
     const raw_response = document.createElement('pre');
@@ -336,12 +314,7 @@ class UIManager {
 
     debate_thinking.textContent = debate[1]['result']['reasoning'];
     debate_say.textContent = debate[1]['result']['say'];
-    debate_container.append(
-      name_and_image,
-      debate_thinking,
-      debate_say,
-      hidden_info,
-    );
+    debate_container.append(name_and_image, debate_thinking, debate_say, hidden_info);
 
     debate_container.addEventListener('click', (e) => {
       this.add_debug(hidden_info, debate_container);
@@ -352,7 +325,7 @@ class UIManager {
   }
 
   add_summaries(summaries: any) {
-    let summarize_container = document.createElement('div');
+    const summarize_container = document.createElement('div');
     summarize_container.classList.add('summarize');
 
     for (const summary of summaries) {
@@ -380,12 +353,7 @@ class UIManager {
         raw_response.textContent = summary[1]['raw_resp'];
         prompt.textContent = summary[1]['prompt'];
 
-        player_container.append(
-          player_icon,
-          player_name,
-          player_data,
-          hidden_info,
-        );
+        player_container.append(player_icon, player_name, player_data, hidden_info);
 
         player_container.addEventListener('click', (e) => {
           this.add_debug(hidden_info, player_container);
@@ -406,16 +374,16 @@ class UIManager {
   }
 
   add_votes(votes_raw: any, players: any) {
-    let vote_container = document.createElement('table');
+    const vote_container = document.createElement('table');
     vote_container.classList.add('voting');
     // Only print the final votes
-    let votes = votes_raw[votes_raw.length - 1];
+    const votes = votes_raw.at(-1);
 
-    let name_row = document.createElement('tr');
-    let vote_row = document.createElement('tr');
-    let vote_cells = []
+    const name_row = document.createElement('tr');
+    const vote_row = document.createElement('tr');
+    const vote_cells = [];
     for (const player of players) {
-      const player_container = document.createElement('th')
+      const player_container = document.createElement('th');
       const player_name = document.createElement('div');
       player_name.textContent = player;
       player_name.classList.add(this.get_role_from_name(player));
@@ -426,7 +394,7 @@ class UIManager {
       name_row.append(player_container);
 
       const vote_cell = document.createElement('td');
-      vote_row.append(vote_cell)
+      vote_row.append(vote_cell);
     }
 
     vote_container.append(name_row);
@@ -434,12 +402,11 @@ class UIManager {
     for (const vote of votes) {
       for (let i = 0; i < players.length; i++) {
         const target = vote['log']['result']['vote'];
-        console.log(vote)
-        console.log(players[i])
+        console.log(vote);
+        console.log(players[i]);
         if (target == players[i]) {
           // console.log(vote_row.children)
           // vote_row.children[i].innerHTML += vote.player;
-
 
           const player_container = document.createElement('div');
           player_container.classList.add('bid_player-container');
@@ -455,7 +422,6 @@ class UIManager {
           // const player_icon = document.createElement('img')
           const player_data = document.createElement('span');
 
-
           const hidden_info = document.createElement('div');
           const raw_response = document.createElement('pre');
           const prompt = document.createElement('pre');
@@ -465,17 +431,11 @@ class UIManager {
           raw_response.textContent = vote['log']['raw_resp'];
           prompt.textContent = vote['log']['prompt'];
 
-          player_container.append(
-            player_icon,
-            player_name,
-            player_data,
-            hidden_info,
-          );
+          player_container.append(player_icon, player_name, player_data, hidden_info);
           player_container.addEventListener('click', (e) => {
             this.add_debug(hidden_info, player_container);
           });
           vote_row.children[i].append(player_container);
-
         }
       }
     }
@@ -543,7 +503,7 @@ class UIManager {
       exiled_icon.src = `static/${exiled}.png`;
       exiled_icon.classList.add('exiled-icon');
       new_elem.prepend(exiled_icon);
-      new_elem.classList.add('exiled', exiled, role, role + '-short');
+      new_elem.classList.add('exiled', exiled, role, `${role}-short`);
     }
 
     this.transcript_container.appendChild(new_elem);
@@ -568,7 +528,7 @@ class UIManager {
       eliminated_icon.src = `static/${eliminated}.png`;
       eliminated_icon.classList.add('exiled-icon');
       new_elem.prepend(eliminated_icon);
-      new_elem.classList.add('eliminated', eliminated, role, role + '-short');
+      new_elem.classList.add('eliminated', eliminated, role, `${role}-short`);
     }
 
     this.transcript_container.appendChild(new_elem);
@@ -583,12 +543,12 @@ class UIManager {
   }
 
   add_player(player: any) {
-    let player_container = document.createElement('div');
+    const player_container = document.createElement('div');
     player_container.classList.add('player-container-individual');
 
-    let player_name = document.createElement('p');
-    let player_model = document.createElement('p');
-    let player_icon = document.createElement('img');
+    const player_name = document.createElement('p');
+    const player_model = document.createElement('p');
+    const player_icon = document.createElement('img');
 
     player_name.classList.add(player.name, player.role);
     player_model.classList.add('player-model');
@@ -601,18 +561,10 @@ class UIManager {
     const hidden_info = document.createElement('div');
     hidden_info.classList.add('needs_whitespace', 'hidden');
 
-    hidden_info.append(
-      player_name.cloneNode(true) as HTMLElement,
-      player_model.cloneNode(true) as HTMLElement,
-    );
+    hidden_info.append(player_name.cloneNode(true) as HTMLElement, player_model.cloneNode(true) as HTMLElement);
 
     // player_container.hidden_info = hidden_info;
-    player_container.append(
-      player_icon,
-      player_name,
-      player_model,
-      hidden_info,
-    );
+    player_container.append(player_icon, player_name, player_model, hidden_info);
 
     player_container.addEventListener('click', (e) => {
       this.add_debug(hidden_info, player_container);
@@ -622,7 +574,7 @@ class UIManager {
   }
 
   get_role_from_name(name: string) {
-    let ww_names = demo.data['state']['werewolves'].map((wolf: any) => {
+    const ww_names = demo.data['state']['werewolves'].map((wolf: any) => {
       return wolf.name;
     });
     if (name == demo.data['state']['doctor'].name) {
@@ -637,6 +589,6 @@ class UIManager {
   }
 }
 
-let demo = new Demo();
-let uiManager = new UIManager();
+const demo = new Demo();
+const uiManager = new UIManager();
 demo.retrieve_data();

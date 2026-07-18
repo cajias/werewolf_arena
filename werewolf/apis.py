@@ -39,7 +39,7 @@ def _get_bedrock_client() -> Any:
             )
         except Exception as e:
             raise RuntimeError(
-                f"Failed to create AWS Bedrock client. Ensure AWS credentials are configured. Error: {e}"
+                f"Failed to create AWS Bedrock client. Ensure AWS credentials are configured. Error: {e}",
             ) from e
     return _bedrock_client
 
@@ -51,8 +51,7 @@ def _get_openai_client() -> OpenAI:
         api_key = os.environ.get("OPENAI_API_KEY")
         if not api_key:
             raise RuntimeError(
-                "OPENAI_API_KEY environment variable is not set. "
-                "Please configure your OpenAI API key."
+                "OPENAI_API_KEY environment variable is not set. Please configure your OpenAI API key.",
             )
         _openai_client = OpenAI(api_key=api_key)
     return _openai_client
@@ -76,20 +75,24 @@ def generate(model: str, **kwargs: Any) -> str:
 
     if "gpt" in model:
         return generate_openai(model, **kwargs)
-    elif "claude" in model or "anthropic" in model:
+    if "claude" in model or "anthropic" in model:
         return generate_bedrock(model, **kwargs)
-    elif model.startswith("ollama:"):
+    if model.startswith("ollama:"):
         # Ollama models are prefixed with "ollama:"
         ollama_model = model.replace("ollama:", "")
         return generate_ollama(ollama_model, **kwargs)
-    else:
-        raise ValueError(
-            f"Unsupported model: {model}. Supported models: OpenAI (gpt-*), AWS Bedrock (claude-*, anthropic.*), and Ollama (ollama:*)."
-        )
+    raise ValueError(
+        f"Unsupported model: {model}. Supported models: OpenAI (gpt-*), AWS Bedrock (claude-*, anthropic.*), and Ollama (ollama:*).",
+    )
 
 
 # openai
-def generate_openai(model: str, prompt: str, json_mode: bool = True, **kwargs: Any) -> str:
+def generate_openai(
+    model: str,
+    prompt: str,
+    json_mode: bool = True,
+    **_kwargs: Any,
+) -> str:
     """Generates text using OpenAI API.
 
     Args:
@@ -123,7 +126,7 @@ def generate_openai(model: str, prompt: str, json_mode: bool = True, **kwargs: A
 
         if not response.choices or not response.choices[0].message.content:
             raise ValueError(
-                f"OpenAI API returned invalid response for model {model}"
+                f"OpenAI API returned invalid response for model {model}",
             )
 
         return response.choices[0].message.content
@@ -135,7 +138,12 @@ def generate_openai(model: str, prompt: str, json_mode: bool = True, **kwargs: A
 
 
 # aws bedrock
-def generate_bedrock(model: str, prompt: str, json_mode: bool = True, **kwargs: Any) -> str:
+def generate_bedrock(
+    model: str,
+    prompt: str,
+    _json_mode: bool = True,
+    **kwargs: Any,
+) -> str:
     """Generates text using AWS Bedrock with Claude models.
 
     Args:
@@ -187,12 +195,12 @@ def generate_bedrock(model: str, prompt: str, json_mode: bool = True, **kwargs: 
         # Claude models return content as a list of content blocks
         if "content" not in response_body:
             raise ValueError(
-                f"AWS Bedrock returned response without 'content' field for model {model}"
+                f"AWS Bedrock returned response without 'content' field for model {model}",
             )
 
         if not response_body["content"] or len(response_body["content"]) == 0:
             raise ValueError(
-                f"AWS Bedrock returned empty content for model {model}"
+                f"AWS Bedrock returned empty content for model {model}",
             )
 
         return response_body["content"][0]["text"]
@@ -200,17 +208,17 @@ def generate_bedrock(model: str, prompt: str, json_mode: bool = True, **kwargs: 
     except (BotoCoreError, ClientError) as e:
         raise RuntimeError(
             f"AWS Bedrock API call failed for model {model}. "
-            f"Ensure AWS credentials are configured and the model is accessible. Error: {e}"
+            f"Ensure AWS credentials are configured and the model is accessible. Error: {e}",
         ) from e
     except json.JSONDecodeError as e:
         raise ValueError(
-            f"Failed to parse AWS Bedrock response for model {model}: {e}"
+            f"Failed to parse AWS Bedrock response for model {model}: {e}",
         ) from e
     except Exception as e:
         if isinstance(e, (RuntimeError, ValueError)):
             raise
         raise RuntimeError(
-            f"Unexpected error calling AWS Bedrock for model {model}: {e}"
+            f"Unexpected error calling AWS Bedrock for model {model}: {e}",
         ) from e
 
 
@@ -252,7 +260,7 @@ def generate_ollama(model: str, prompt: str, json_mode: bool = True, **kwargs: A
             "options": {
                 "num_predict": max_tokens,
                 "temperature": temperature,
-            }
+            },
         }
 
         # Add format parameter for JSON mode
@@ -273,7 +281,7 @@ def generate_ollama(model: str, prompt: str, json_mode: bool = True, **kwargs: A
 
         if "response" not in response_data:
             raise ValueError(
-                f"Ollama API returned response without 'response' field for model {model}"
+                f"Ollama API returned response without 'response' field for model {model}",
             )
 
         return response_data["response"]
@@ -281,25 +289,25 @@ def generate_ollama(model: str, prompt: str, json_mode: bool = True, **kwargs: A
     except requests.exceptions.ConnectionError as e:
         raise RuntimeError(
             f"Could not connect to Ollama server at {base_url}. "
-            f"Ensure Ollama is running (try 'ollama serve'). Error: {e}"
+            f"Ensure Ollama is running (try 'ollama serve'). Error: {e}",
         ) from e
     except requests.exceptions.Timeout as e:
         raise RuntimeError(
             f"Ollama API call timed out for model {model}. "
-            f"The model may be too slow or the prompt too complex. Error: {e}"
+            f"The model may be too slow or the prompt too complex. Error: {e}",
         ) from e
     except requests.exceptions.HTTPError as e:
         raise RuntimeError(
             f"Ollama API returned HTTP error for model {model}. "
-            f"The model may not be available. Try 'ollama pull {model}'. Error: {e}"
+            f"The model may not be available. Try 'ollama pull {model}'. Error: {e}",
         ) from e
     except json.JSONDecodeError as e:
         raise ValueError(
-            f"Failed to parse Ollama response for model {model}: {e}"
+            f"Failed to parse Ollama response for model {model}: {e}",
         ) from e
     except Exception as e:
         if isinstance(e, (RuntimeError, ValueError)):
             raise
         raise RuntimeError(
-            f"Unexpected error calling Ollama for model {model}: {e}"
+            f"Unexpected error calling Ollama for model {model}: {e}",
         ) from e

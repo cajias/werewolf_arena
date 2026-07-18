@@ -21,6 +21,7 @@ python3 main.py --eval --num_games=10 --v_models=pro1.5,flash --w_models=gpt4,gp
 ```
 
 This will run games with all combinations:
+
 - Gemini Pro 1.5 villagers vs GPT-4 werewolves
 - Gemini Pro 1.5 villagers vs GPT-4o werewolves
 - Gemini Flash villagers vs GPT-4 werewolves
@@ -47,11 +48,13 @@ Note: The games to resume must be configured in `werewolf/runner.py` by setting 
 ## Available Models
 
 ### OpenAI Models
+
 - `gpt4` - GPT-4 Turbo (gpt-4-turbo-2024-04-09)
 - `gpt4o` - GPT-4o (gpt-4o-2024-05-13)
 - `gpt3.5` - GPT-3.5 Turbo (gpt-3.5-turbo-0125)
 
 ### Google Gemini Models
+
 - `pro1.5` - Gemini 1.5 Pro (gemini-1.5-pro-preview-0514)
 - `flash` - Gemini 1.5 Flash (gemini-1.5-flash-001)
 - `pro1` - Gemini Pro 1.0 (gemini-pro)
@@ -76,11 +79,13 @@ After running games, logs are saved in timestamped directories (e.g., `session_2
 To view a completed game in the interactive viewer:
 
 1. Install Node.js dependencies:
+
    ```bash
    npm install
    ```
 
 2. Start the viewer:
+
    ```bash
    npm run start
    ```
@@ -101,6 +106,7 @@ See the `run_experiments.sh` file for a sample batch experiment script.
    - GCP/Gemini: Run `gcloud auth application-default login`
 
 2. **Parallel Execution**: Use the `--threads` flag to speed up player actions:
+
    ```bash
    python3 main.py --run --v_models=pro1.5 --w_models=gpt4 --threads=4
    ```

@@ -17,7 +17,6 @@
 from werewolf.config import get_player_names
 from werewolf.model import Doctor, Round, Seer, State, Villager, Werewolf
 
-
 class TestGameFlow:
     """Integration tests for complete game workflows."""
 
@@ -31,10 +30,7 @@ class TestGameFlow:
             Werewolf(name=player_names[2], model="test-model"),
             Werewolf(name=player_names[3], model="test-model"),
         ]
-        villagers = [
-            Villager(name=name, model="test-model")
-            for name in player_names[4:8]
-        ]
+        villagers = [Villager(name=name, model="test-model") for name in player_names[4:8]]
 
         state = State(
             session_id="test_session",
@@ -61,12 +57,9 @@ class TestGameFlow:
             Werewolf(name=player_names[2], model="test-model"),
             Werewolf(name=player_names[3], model="test-model"),
         ]
-        villagers = [
-            Villager(name=name, model="test-model")
-            for name in player_names[4:8]
-        ]
+        villagers = [Villager(name=name, model="test-model") for name in player_names[4:8]]
 
-        all_players = [seer, doctor] + werewolves + villagers
+        all_players = [seer, doctor, *werewolves, *villagers]
         all_names = [p.name for p in all_players]
 
         # Initialize all players
@@ -75,7 +68,7 @@ class TestGameFlow:
             if isinstance(player, Werewolf):
                 other_wolf = next(
                     (w.name for w in werewolves if w != player),
-                    None
+                    None,
                 )
 
             player.initialize_game_view(
@@ -104,10 +97,7 @@ class TestGameFlow:
             Werewolf(name=player_names[2], model="test-model"),
             Werewolf(name=player_names[3], model="test-model"),
         ]
-        villagers = [
-            Villager(name=name, model="test-model")
-            for name in player_names[4:8]
-        ]
+        villagers = [Villager(name=name, model="test-model") for name in player_names[4:8]]
 
         state = State(
             session_id="test_session",
@@ -136,12 +126,9 @@ class TestGameFlow:
             Werewolf(name=player_names[2], model="test-model"),
             Werewolf(name=player_names[3], model="test-model"),
         ]
-        villagers = [
-            Villager(name=name, model="test-model")
-            for name in player_names[4:8]
-        ]
+        villagers = [Villager(name=name, model="test-model") for name in player_names[4:8]]
 
-        all_players = [seer, doctor] + werewolves + villagers
+        all_players = [seer, doctor, *werewolves, *villagers]
         all_names = [p.name for p in all_players]
 
         # Initialize all players
@@ -172,12 +159,9 @@ class TestGameFlow:
             Werewolf(name=player_names[2], model="test-model"),
             Werewolf(name=player_names[3], model="test-model"),
         ]
-        villagers = [
-            Villager(name=name, model="test-model")
-            for name in player_names[4:8]
-        ]
+        villagers = [Villager(name=name, model="test-model") for name in player_names[4:8]]
 
-        all_players = [seer, doctor] + werewolves + villagers
+        all_players = [seer, doctor, *werewolves, *villagers]
         all_names = [p.name for p in all_players]
 
         # Initialize all players

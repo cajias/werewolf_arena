@@ -5,6 +5,7 @@ This project includes automated CI testing with Ollama for running e2e tests wit
 ## 🚀 Ready to Use!
 
 The GitHub Actions workflow is **already configured** and will run automatically on:
+
 - Push to `main` or `develop` branches
 - Pull requests to `main` or `develop`
 - Manual trigger (workflow_dispatch)
@@ -34,6 +35,7 @@ The GitHub Actions workflow is **already configured** and will run automatically
 ### No Setup Required! 🎉
 
 The workflow uses **GitHub Container Registry (ghcr.io)** which:
+
 - ✅ Automatically available with your GitHub repo
 - ✅ No external accounts needed
 - ✅ No secrets to configure
@@ -45,6 +47,7 @@ The workflow will automatically publish Docker images to `ghcr.io/YOUR_USERNAME/
 ## Running Tests Locally
 
 ### Option 1: Mocked Tests (No Setup)
+
 ```bash
 # Run all tests with mocked Ollama responses
 python3 -m pytest tests/test_e2e_ollama.py -v
@@ -53,6 +56,7 @@ python3 -m pytest tests/test_e2e_ollama.py -v
 ```
 
 ### Option 2: Real Ollama Integration
+
 ```bash
 # Install Ollama (one-time)
 curl -fsSL https://ollama.com/install.sh | sh
@@ -69,6 +73,7 @@ python3 -m pytest tests/ -v
 ```
 
 ### Option 3: Docker (Local Build)
+
 ```bash
 # Build image locally
 docker build -f Dockerfile.ollama -t werewolf-test .
@@ -78,6 +83,7 @@ docker run --rm werewolf-test
 ```
 
 ### Option 4: Docker (Pull from GitHub)
+
 ```bash
 # Pull pre-built image from GitHub Container Registry
 docker pull ghcr.io/YOUR_USERNAME/YOUR_REPO:latest
@@ -136,17 +142,20 @@ docker pull ghcr.io/YOUR_USERNAME/YOUR_REPO:latest
 ## Monitoring CI
 
 ### Check Workflow Status
+
 1. Go to your repo on GitHub
 2. Click "Actions" tab
 3. See recent workflow runs
 
 ### Typical CI Times
+
 - **Unit tests**: 2-3 minutes
 - **Ollama integration**: 5-8 minutes
 - **Docker build** (if enabled): 10-15 minutes
 - **Total**: ~8-12 minutes per run
 
 ### Cost (GitHub Actions Free Tier)
+
 - 2,000 minutes/month free
 - ~8 min per run = ~250 runs/month free
 - More than enough for most projects!
@@ -154,19 +163,23 @@ docker pull ghcr.io/YOUR_USERNAME/YOUR_REPO:latest
 ## Troubleshooting
 
 ### CI Fails: "Ollama not responding"
+
 - Increase sleep time in workflow
 - Check Ollama logs in CI output
 
 ### CI Fails: "Out of disk space"
+
 - Using too large model
 - Switch to `qwen:0.5b` (only ~400MB)
 
 ### Tests Pass Locally but Fail in CI
+
 - Check Python version (CI uses 3.11)
 - Check dependency versions
 - Review CI logs for specific errors
 
 ### Docker Build Fails
+
 - Check `.dockerignore` isn't excluding needed files
 - Verify Dockerfile.ollama syntax
 - Check CI has enough disk space

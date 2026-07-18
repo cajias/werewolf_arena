@@ -30,7 +30,6 @@ from pathlib import Path
 
 from werewolf.analysis import analyze_multiple_sessions
 
-
 def main() -> None:
     """Analyze games from command-line arguments."""
     if len(sys.argv) < 2:

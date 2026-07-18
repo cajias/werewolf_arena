@@ -20,7 +20,6 @@ from typing import Any, Dict, List, Optional
 
 from werewolf.model import State
 
-
 class GameStats:
     """Statistics for a single game."""
 
@@ -61,9 +60,7 @@ class GameStats:
         player_stats = {}
 
         for player_name, player in self.state.players.items():
-            survived = player_name in (
-                self.state.rounds[-1].players if self.state.rounds else []
-            )
+            survived = player_name in (self.state.rounds[-1].players if self.state.rounds else [])
 
             player_stats[player_name] = {
                 "role": player.role,
@@ -122,12 +119,8 @@ class ExperimentAnalyzer:
         if not self.game_stats:
             return {"Werewolves": 0.0, "Villagers": 0.0}
 
-        werewolf_wins = sum(
-            1 for game in self.game_stats if game.winner == "Werewolves"
-        )
-        villager_wins = sum(
-            1 for game in self.game_stats if game.winner == "Villagers"
-        )
+        werewolf_wins = sum(1 for game in self.game_stats if game.winner == "Werewolves")
+        villager_wins = sum(1 for game in self.game_stats if game.winner == "Villagers")
         total = len(self.game_stats)
 
         return {
@@ -159,7 +152,7 @@ class ExperimentAnalyzer:
                     model_stats[game.villager_model]["wins"] += 1
 
         # Calculate averages
-        for _model, stats in model_stats.items():
+        for stats in model_stats.values():
             if stats["games"] > 0:
                 stats["win_rate"] = stats["wins"] / stats["games"]
                 stats["avg_rounds"] = stats["avg_rounds"] / stats["games"]
@@ -241,7 +234,7 @@ def analyze_session_directory(session_dir: str) -> Optional[GameStats]:
     from werewolf import logging as ww_logging
 
     try:
-        state, logs = ww_logging.load_game(session_dir)
+        state, _logs = ww_logging.load_game(session_dir)
         return GameStats(state)
     except Exception as e:
         print(f"Error analyzing {session_dir}: {e}")
@@ -263,7 +256,7 @@ def analyze_multiple_sessions(session_dirs: List[str]) -> ExperimentAnalyzer:
 
     for session_dir in session_dirs:
         try:
-            state, logs = ww_logging.load_game(session_dir)
+            state, _logs = ww_logging.load_game(session_dir)
             analyzer.add_game(state)
         except Exception as e:
             print(f"Error loading {session_dir}: {e}")

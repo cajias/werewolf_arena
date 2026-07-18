@@ -17,7 +17,6 @@
 from werewolf.game import GameMaster, get_max_bids
 from werewolf.model import Round, RoundLog
 
-
 class TestGetMaxBids:
     """Tests for the get_max_bids helper function."""
 
@@ -110,8 +109,12 @@ class TestGameMaster:
 
         # Set up scenario: 2 werewolves, 4 villagers (game continues)
         gm.this_round.players = [
-            "Wolf1", "Wolf2", "Villager1", "Villager2",
-            "Villager3", "TestSeer"
+            "Wolf1",
+            "Wolf2",
+            "Villager1",
+            "Villager2",
+            "Villager3",
+            "TestSeer",
         ]
 
         winner = gm.get_winner()
@@ -158,13 +161,15 @@ class TestGameMaster:
                 current_players=gm.this_round.players.copy(),
             )
 
-        gm.this_round.votes.append({
-            "Wolf1": "Villager1",
-            "Wolf2": "Villager1",
-            "Villager1": "Wolf1",
-            "Villager2": "Villager1",
-            "TestSeer": "Villager1",
-        })
+        gm.this_round.votes.append(
+            {
+                "Wolf1": "Villager1",
+                "Wolf2": "Villager1",
+                "Villager1": "Wolf1",
+                "Villager2": "Villager1",
+                "TestSeer": "Villager1",
+            },
+        )
 
         gm.exile()
 
@@ -188,12 +193,14 @@ class TestGameMaster:
                 current_players=gm.this_round.players.copy(),
             )
 
-        gm.this_round.votes.append({
-            "Wolf1": "Villager1",
-            "Wolf2": "Villager1",
-            "Villager1": "Wolf1",
-            "Villager2": "Wolf1",
-        })
+        gm.this_round.votes.append(
+            {
+                "Wolf1": "Villager1",
+                "Wolf2": "Villager1",
+                "Villager1": "Wolf1",
+                "Villager2": "Wolf1",
+            },
+        )
 
         gm.exile()
 

@@ -18,7 +18,6 @@ import pytest
 
 from werewolf.model import Doctor, Seer, State, Villager, Werewolf
 
-
 @pytest.fixture
 def mock_player_names():
     """Fixture providing a list of player names for testing."""

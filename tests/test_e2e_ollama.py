@@ -23,7 +23,6 @@ from werewolf.game import GameMaster
 from werewolf.model import Doctor, Seer, State, Villager, Werewolf
 from werewolf.runner import initialize_players
 
-
 class TestOllamaE2E:
     """End-to-end tests using Ollama models (mocked)."""
 
@@ -33,7 +32,7 @@ class TestOllamaE2E:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
-            "response": '{"action": "vote", "target": "Alice", "reasoning": "Test reasoning"}'
+            "response": '{"action": "vote", "target": "Alice", "reasoning": "Test reasoning"}',
         }
         return mock_response
 
@@ -48,20 +47,15 @@ class TestOllamaE2E:
             Werewolf(name=player_names[2], model="ollama:deepseek-r1:latest"),
             Werewolf(name=player_names[3], model="ollama:deepseek-r1:latest"),
         ]
-        villagers = [
-            Villager(name=name, model="ollama:deepseek-r1:latest")
-            for name in player_names[4:8]
-        ]
+        villagers = [Villager(name=name, model="ollama:deepseek-r1:latest") for name in player_names[4:8]]
 
-        state = State(
+        return State(
             session_id="test_ollama_session",
             seer=seer,
             doctor=doctor,
             villagers=villagers,
             werewolves=werewolves,
         )
-
-        return state
 
     def test_ollama_model_initialization(self, ollama_state: State) -> None:
         """Test that Ollama models are properly initialized in game state."""
@@ -76,7 +70,10 @@ class TestOllamaE2E:
 
     @patch("requests.post")
     def test_ollama_game_initialization(
-        self, mock_post: Mock, mock_ollama_response: Mock, ollama_state: State
+        self,
+        mock_post: Mock,
+        mock_ollama_response: Mock,
+        ollama_state: State,
     ) -> None:
         """Test initializing a game with Ollama models."""
         mock_post.return_value = mock_ollama_response
@@ -91,7 +88,9 @@ class TestOllamaE2E:
 
     @patch("requests.post")
     def test_ollama_player_initialization(
-        self, mock_post: Mock, mock_ollama_response: Mock
+        self,
+        mock_post: Mock,
+        mock_ollama_response: Mock,
     ) -> None:
         """Test initialize_players function with Ollama models."""
         mock_post.return_value = mock_ollama_response
@@ -103,7 +102,7 @@ class TestOllamaE2E:
         )
 
         # Verify all players are initialized with correct models
-        all_players = [seer, doctor] + werewolves + villagers
+        all_players = [seer, doctor, *werewolves, *villagers]
         assert all(p.model == "ollama:deepseek-r1:latest" for p in all_players)
 
         # Verify werewolves know about each other

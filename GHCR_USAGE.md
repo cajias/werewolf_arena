@@ -43,12 +43,12 @@ docker run --rm ghcr.io/YOUR_USERNAME/werewolf_arena:latest
 
 Images are tagged automatically based on the branch and commit:
 
-| Tag | Description | Example |
-|-----|-------------|---------|
-| `latest` | Latest from main branch | `ghcr.io/user/repo:latest` |
-| `main` | Latest from main branch | `ghcr.io/user/repo:main` |
-| `develop` | Latest from develop branch | `ghcr.io/user/repo:develop` |
-| `main-abc1234` | Specific commit from main | `ghcr.io/user/repo:main-abc1234` |
+| Tag               | Description                  | Example                             |
+| ----------------- | ---------------------------- | ----------------------------------- |
+| `latest`          | Latest from main branch      | `ghcr.io/user/repo:latest`          |
+| `main`            | Latest from main branch      | `ghcr.io/user/repo:main`            |
+| `develop`         | Latest from develop branch   | `ghcr.io/user/repo:develop`         |
+| `main-abc1234`    | Specific commit from main    | `ghcr.io/user/repo:main-abc1234`    |
 | `develop-xyz5678` | Specific commit from develop | `ghcr.io/user/repo:develop-xyz5678` |
 
 ### Using Specific Tags
@@ -100,12 +100,14 @@ By default, images pushed to GitHub Container Registry are private. To make them
 7. Confirm the change
 
 **Benefits of public images:**
+
 - ✅ Anyone can pull without authentication
 - ✅ Easier for collaborators
 - ✅ Can be used in public CI/CD pipelines
 - ✅ Discoverable on GitHub
 
 **Keep private if:**
+
 - ❌ Contains proprietary code
 - ❌ Not ready for public use
 - ❌ Want to control access
@@ -113,11 +115,13 @@ By default, images pushed to GitHub Container Registry are private. To make them
 ## Viewing Package Details
 
 ### On GitHub Web
+
 1. Go to your repository
 2. Click "Packages" in the right sidebar
 3. View downloads, tags, and metadata
 
 ### Using GitHub CLI
+
 ```bash
 # List packages for your user
 gh api user/packages --jq '.[].name'
@@ -131,11 +135,13 @@ gh api user/packages/container/werewolf_arena
 To save space, you can delete old images:
 
 ### Via Web Interface
+
 1. Go to the package page
 2. Click on a specific version
 3. Click "Delete version"
 
 ### Via API
+
 ```bash
 # Delete a specific version
 gh api --method DELETE \
@@ -145,6 +151,7 @@ gh api --method DELETE \
 ## Using in Other CI/CD Systems
 
 ### GitHub Actions (Other Repos)
+
 ```yaml
 jobs:
   test:
@@ -161,6 +168,7 @@ jobs:
 ```
 
 ### GitLab CI
+
 ```yaml
 test:
   image: ghcr.io/YOUR_USERNAME/werewolf_arena:latest
@@ -171,6 +179,7 @@ test:
 ```
 
 ### CircleCI
+
 ```yaml
 version: 2.1
 jobs:
@@ -187,27 +196,33 @@ jobs:
 ## Troubleshooting
 
 ### "authentication required"
+
 **Problem**: Trying to pull a private image without authentication
 
 **Solution**:
+
 ```bash
 # Create a GitHub Personal Access Token with read:packages scope
 echo YOUR_TOKEN | docker login ghcr.io -u YOUR_USERNAME --password-stdin
 ```
 
 ### "image not found"
+
 **Problem**: Image hasn't been published yet
 
 **Solutions**:
+
 1. Check if CI workflow completed successfully
 2. Verify you pushed to `main` or `develop` branch
 3. Check the "Packages" tab on GitHub
 4. Ensure workflow has `packages: write` permission
 
 ### "no space left on device"
+
 **Problem**: Too many old images taking up space
 
 **Solution**:
+
 ```bash
 # Clean up old images
 docker system prune -a
@@ -217,9 +232,11 @@ docker rmi ghcr.io/YOUR_USERNAME/werewolf_arena:old-tag
 ```
 
 ### "denied: installation not allowed"
+
 **Problem**: Repository doesn't have package permissions
 
 **Solution**:
+
 1. Go to repo Settings → Actions → General
 2. Under "Workflow permissions"
 3. Select "Read and write permissions"
@@ -256,6 +273,7 @@ To add custom tags (like version numbers), update the workflow:
 ```
 
 Then create Git tags to trigger versioned builds:
+
 ```bash
 git tag v1.0.0
 git push origin v1.0.0

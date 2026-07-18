@@ -20,7 +20,6 @@ from typing import Any, Dict, Optional
 import marko
 import yaml
 
-
 def parse_json(text: str) -> Optional[Dict[str, Any]]:
     result_json = parse_json_markdown(text)
 

@@ -21,7 +21,6 @@ from werewolf import apis, utils
 from werewolf.config import RETRIES
 from werewolf.utils import Deserializable
 
-
 @dataclasses.dataclass
 class LmLog(Deserializable):
     prompt: str
@@ -63,7 +62,6 @@ def generate(
     Returns:
         A tuple containing the result (or None if unsuccessful) and the LmLog.
     """
-
     prompt = format_prompt(prompt_template, worldstate)
     raw_responses = []
     for _ in range(RETRIES):
@@ -92,5 +90,7 @@ def generate(
         raw_responses.append(raw_resp)
 
     return None, LmLog(
-        prompt=prompt, raw_resp="-------".join(raw_responses), result=None
+        prompt=prompt,
+        raw_resp="-------".join(raw_responses),
+        result=None,
     )

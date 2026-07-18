@@ -18,7 +18,6 @@ from absl import app as absl_app
 
 from werewolf.runner import run
 
-
 def main(_: Any) -> None:
     run()
 

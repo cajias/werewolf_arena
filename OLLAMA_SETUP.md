@@ -67,11 +67,11 @@ python3 main.py --eval --num_games=3 --v_models=qwen --w_models=deepseek-r1
 
 ## Available Ollama Models
 
-| Model Name | Command | Size | Speed | Quality |
-|------------|---------|------|-------|---------|
-| qwen | `--v_models=qwen` | ~0.5GB | ⚡⚡⚡ | ⭐⭐ |
-| llama2 | `--v_models=llama2` | ~4GB | ⚡⚡ | ⭐⭐⭐ |
-| deepseek-r1 | `--v_models=deepseek-r1` | ~40GB | ⚡ | ⭐⭐⭐⭐⭐ |
+| Model Name  | Command                  | Size   | Speed  | Quality    |
+| ----------- | ------------------------ | ------ | ------ | ---------- |
+| qwen        | `--v_models=qwen`        | ~0.5GB | ⚡⚡⚡ | ⭐⭐       |
+| llama2      | `--v_models=llama2`      | ~4GB   | ⚡⚡   | ⭐⭐⭐     |
+| deepseek-r1 | `--v_models=deepseek-r1` | ~40GB  | ⚡     | ⭐⭐⭐⭐⭐ |
 
 ## Configuration
 
@@ -126,6 +126,7 @@ python3 -m pytest tests/ -v
 **Problem**: Ollama server is not running
 
 **Solution**:
+
 ```bash
 # Check if Ollama is running
 ps aux | grep ollama
@@ -139,6 +140,7 @@ ollama serve
 **Problem**: Model not downloaded
 
 **Solution**:
+
 ```bash
 # List available models
 ollama list
@@ -152,6 +154,7 @@ ollama pull qwen:0.5b
 **Problem**: Model is too slow or prompt is too complex
 
 **Solutions**:
+
 - Use a smaller/faster model (qwen:0.5b instead of deepseek-r1)
 - Reduce the number of debate turns in the game
 - Increase hardware resources (CPU/RAM)
@@ -165,6 +168,7 @@ ollama pull qwen:0.5b
    - Check: `nvidia-smi` for NVIDIA GPUs
 
 2. **Adjust model size**:
+
    ```bash
    # Faster but less capable
    ollama pull qwen:0.5b
@@ -184,15 +188,15 @@ ollama pull qwen:0.5b
 
 ## Comparison: Ollama vs Cloud APIs
 
-| Feature | Ollama | OpenAI | AWS Bedrock |
-|---------|--------|--------|-------------|
-| Setup | Medium | Easy | Complex |
-| Cost | Free | $$ per token | $$ per token |
-| Speed | Depends on HW | Fast | Fast |
-| Privacy | ✅ Local | ❌ Cloud | ❌ Cloud |
-| Model Quality | Good | Excellent | Excellent |
-| API Keys | ❌ Not needed | ✅ Required | ✅ Required |
-| Best For | Dev/Testing | Production | Enterprise |
+| Feature       | Ollama        | OpenAI       | AWS Bedrock  |
+| ------------- | ------------- | ------------ | ------------ |
+| Setup         | Medium        | Easy         | Complex      |
+| Cost          | Free          | $$ per token | $$ per token |
+| Speed         | Depends on HW | Fast         | Fast         |
+| Privacy       | ✅ Local      | ❌ Cloud     | ❌ Cloud     |
+| Model Quality | Good          | Excellent    | Excellent    |
+| API Keys      | ❌ Not needed | ✅ Required  | ✅ Required  |
+| Best For      | Dev/Testing   | Production   | Enterprise   |
 
 ## Example: Complete Workflow
 
@@ -221,6 +225,7 @@ npm run start
 To add new Ollama models to the game:
 
 1. Edit `werewolf/runner.py`:
+
 ```python
 model_to_id = {
     # ... existing models ...
@@ -230,6 +235,7 @@ model_to_id = {
 ```
 
 2. Update the CLI help text:
+
 ```python
 _VILLAGER_MODELS = flags.DEFINE_list(
     "v_models",
@@ -239,11 +245,13 @@ _VILLAGER_MODELS = flags.DEFINE_list(
 ```
 
 3. Pull the model:
+
 ```bash
 ollama pull mistral
 ```
 
 4. Use it:
+
 ```bash
 python3 main.py --run --v_models=mistral --w_models=codellama
 ```

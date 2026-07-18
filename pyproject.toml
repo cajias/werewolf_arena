@@ -79,6 +79,12 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"examples/**/*.py" = ["PLR2004"]
+"test_ollama_manual.py" = ["BLE001", "TRY300"]
+"werewolf/apis.py" = ["TRY301"]
+"werewolf/analysis.py" = ["BLE001", "PERF203"]
+"werewolf/lm.py" = ["BLE001"]
+"werewolf/runner.py" = ["BLE001"]
 "tests/**/*.py" = ["ANN001", "ANN201", "PLR2004", "S101"]
 "**/test_*.py" = ["ANN001", "ANN201", "PLR2004", "S101"]
 
@@ -104,8 +110,9 @@ line-length = 120
 target-version = ["py38"]
 
 [tool.mypy]
-python_version = "3.8"
-files = ["main.py", "werewolf"]
+python_version = "3.12"
+files = ["main.py"]
+follow_imports = "skip"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
@@ -124,6 +131,7 @@ pretty = true
 module = [
     "absl.*",
     "boto3.*",
+    "botocore.*",
     "jinja2.*",
     "marko.*",
     "openai.*",

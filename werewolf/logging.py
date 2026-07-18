@@ -19,13 +19,11 @@ from typing import List, Tuple
 
 from werewolf.model import RoundLog, State, to_dict
 
-
 def log_directory() -> str:
     pacific_timezone = datetime.timezone(datetime.timedelta(hours=-8))
     timestamp = datetime.datetime.now(pacific_timezone).strftime("%Y%m%d_%H%M%S")
     session_id = f"session_{timestamp}"
-    directory = f"{os.getcwd()}/logs/{session_id}"
-    return directory
+    return f"{os.getcwd()}/logs/{session_id}"
 
 
 def load_game(directory: str) -> Tuple[State, List[RoundLog]]:
@@ -37,7 +35,6 @@ def load_game(directory: str) -> Tuple[State, List[RoundLog]]:
     Returns:
       State: An instance of the State class populated with the game data.
     """
-
     partial_game_state_file = f"{directory}/game_partial.json"
     complete_game_state_file = f"{directory}/game_complete.json"
     log_file = f"{directory}/game_logs.json"
@@ -46,12 +43,12 @@ def load_game(directory: str) -> Tuple[State, List[RoundLog]]:
     if not os.path.exists(partial_game_state_file):
         game_state_file = complete_game_state_file
 
-    with open(game_state_file, "r") as file:
+    with open(game_state_file) as file:
         partial_game_data = json.load(file)
 
     state = State.from_json(partial_game_data)
 
-    with open(log_file, "r") as file:
+    with open(log_file) as file:
         logs = json.load(file)
 
     logs = [RoundLog.from_json(log) for log in logs]
