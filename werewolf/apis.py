@@ -91,7 +91,7 @@ def generate_openai(
     model: str,
     prompt: str,
     json_mode: bool = True,
-    **kwargs: Any,
+    **_kwargs: Any,
 ) -> str:
     """Generates text using OpenAI API.
 
@@ -99,7 +99,7 @@ def generate_openai(
         model: OpenAI model identifier (e.g., 'gpt-4', 'gpt-4o')
         prompt: Input prompt text
         json_mode: If True, request JSON-formatted response
-        **kwargs: Additional arguments (unused, for compatibility)
+        **_kwargs: Additional arguments accepted for backend signature parity.
 
     Returns:
         Generated text response
@@ -108,8 +108,6 @@ def generate_openai(
         RuntimeError: If API key is not configured or API call fails
         ValueError: If response is invalid
     """
-    # Keep backend signatures aligned so the dispatcher can forward shared kwargs.
-    _ = kwargs
     if not prompt:
         raise ValueError("Prompt parameter cannot be empty")
 
@@ -143,7 +141,7 @@ def generate_openai(
 def generate_bedrock(
     model: str,
     prompt: str,
-    json_mode: bool = True,
+    _json_mode: bool = True,
     **kwargs: Any,
 ) -> str:
     """Generates text using AWS Bedrock with Claude models.
@@ -151,7 +149,7 @@ def generate_bedrock(
     Args:
         model: Bedrock model identifier (e.g., 'anthropic.claude-3-sonnet-20240229-v1:0')
         prompt: Input prompt text
-        json_mode: Reserved for future use (currently ignored for Bedrock compatibility)
+        _json_mode: Accepted for backend signature parity; currently ignored by Bedrock.
         **kwargs: Additional arguments:
             - max_tokens: Maximum tokens to generate (default: 4096)
             - temperature: Sampling temperature (default: not set, uses model default)
@@ -163,8 +161,6 @@ def generate_bedrock(
         RuntimeError: If AWS credentials are not configured or API call fails
         ValueError: If prompt is empty or response is invalid
     """
-    # Bedrock ignores JSON mode today, but the parameter is kept for signature parity.
-    _ = json_mode
     if not prompt:
         raise ValueError("Prompt parameter cannot be empty")
 
