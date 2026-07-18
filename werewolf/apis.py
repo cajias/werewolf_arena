@@ -91,7 +91,7 @@ def generate_openai(
     model: str,
     prompt: str,
     json_mode: bool = True,
-    **_kwargs: Any,
+    **kwargs: Any,
 ) -> str:
     """Generates text using OpenAI API.
 
@@ -108,6 +108,7 @@ def generate_openai(
         RuntimeError: If API key is not configured or API call fails
         ValueError: If response is invalid
     """
+    del kwargs
     if not prompt:
         raise ValueError("Prompt parameter cannot be empty")
 

@@ -296,9 +296,7 @@ class GameMaster:
 
     def get_winner(self) -> str:
         """Determine the winner of the game."""
-        active_wolves = set(self.this_round.players) & set(
-            {w.name for w in self.state.werewolves},
-        )
+        active_wolves = set(self.this_round.players) & {w.name for w in self.state.werewolves}
         active_villagers = set(self.this_round.players) - active_wolves
         if len(active_wolves) >= len(active_villagers):
             return "Werewolves"
